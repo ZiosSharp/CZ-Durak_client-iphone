@@ -1,0 +1,1101 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CZ Durak client_46</title>
+<style>
+  :root{
+    --table:#5c341d; --table-dark:#26150c; --panel:rgba(72,42,24,.42); --text:#f6f6f6;
+    --accent:#e6d8ae; --shadow:0 10px 24px rgba(0,0,0,.32); --page-bg-image:radial-gradient(circle at 30% 26%, #eadbc0 0%, #d3b186 34%, #b17d56 68%, #8e6140 100%); --button-bg-image:none;
+    --card-w:78px; --card-h:112px; --red:#d81f1f; --black:#111; --blue-back:#4966d6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background-image:linear-gradient(rgba(18,10,7,.12), rgba(18,10,7,.12)), var(--page-bg-image);background-size:cover,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;background-attachment:fixed,fixed;min-height:100vh}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 18px 30px}
+  h1{margin:8px 0 12px;text-align:center;font-size:30px}
+  .topbar{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .btn-main,.btn-open,.btn-log,.btn-draw,select,textarea,input,button{border:none;border-radius:10px;padding:12px 16px;font-size:18px;box-shadow:var(--shadow)}
+  select,button,textarea,input{border:none;border-radius:10px;padding:12px 16px;font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
+  textarea,input{cursor:text}
+  button{cursor:pointer}
+  .btn-main{background:#efefef;color:#111}
+  .btn-open{background:#f3e08d;color:#111}
+  .btn-log{background:#d4eef9;color:#111}
+  .btn-draw{background:#d7cf5a;color:#111; min-width:260px}
+  .btn-draw[disabled], button[disabled]{opacity:.45; cursor:not-allowed}
+  .btn-bg{background:#ead7b3;color:#2d1a10;padding:9px 12px;font-size:16px;min-width:108px}
+
+  .btn-main,.btn-open,.btn-log,.btn-draw,.btn-bg,.picker-inline button,.round-end button,.history-box button{
+    background-color:#d7be9a;
+    background-image:linear-gradient(180deg, rgba(255,250,240,.26), rgba(72,43,25,.16)), var(--button-bg-image);
+    background-size:100% 100%,100% 100%;
+    background-position:center,center;
+    background-repeat:no-repeat,no-repeat;
+    border:1px solid rgba(255,241,221,.54);
+    text-shadow:0 1px 0 rgba(255,255,255,.30);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.38), inset 0 -2px 4px rgba(75,42,22,.16), 0 8px 18px rgba(0,0,0,.20);
+  }
+  .btn-next,.btn-open,.btn-newgame,.btn-log,.btn-bg,.btn-draw{font-weight:700}
+  .btn-next{border-color:rgba(127,212,151,.66); box-shadow:inset 0 1px 0 rgba(255,255,255,.38), inset 0 -2px 4px rgba(75,42,22,.16), 0 0 0 1px rgba(127,212,151,.26), 0 8px 18px rgba(0,0,0,.20)}
+  .btn-open{border-color:rgba(239,214,108,.70); box-shadow:inset 0 1px 0 rgba(255,255,255,.38), inset 0 -2px 4px rgba(75,42,22,.16), 0 0 0 1px rgba(239,214,108,.22), 0 8px 18px rgba(0,0,0,.20)}
+  .btn-newgame{border-color:rgba(235,154,154,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.32), inset 0 -2px 4px rgba(95,32,24,.18), 0 0 0 1px rgba(235,154,154,.24), 0 8px 18px rgba(0,0,0,.22)}
+  .btn-log,.btn-bg{border-color:rgba(196,224,255,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.38), inset 0 -2px 4px rgba(75,42,22,.16), 0 0 0 1px rgba(196,224,255,.24), 0 8px 18px rgba(0,0,0,.20)}
+  .btn-draw{border-color:rgba(228,208,112,.72)}
+  .btn-main:hover,.btn-open:hover,.btn-log:hover,.btn-draw:hover,.btn-bg:hover,.picker-inline button:hover,.round-end button:hover,.history-box button:hover{transform:translateY(-1px); filter:brightness(1.02)}
+  .scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  .score-card{background:linear-gradient(180deg, rgba(255,247,230,.07), rgba(61,34,19,.10)), rgba(61,34,19,.42);border-radius:16px;padding:14px 18px;box-shadow:var(--shadow);min-height:110px;border:1px solid rgba(255,228,188,.08);backdrop-filter:blur(1px)}
+  .score-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .score-head h3{margin:0;font-size:32px;line-height:1}
+  .count-badge{background:rgba(255,255,255,.16);padding:8px 12px;border-radius:999px;font-size:24px;font-weight:700;min-width:96px;text-align:center}
+  .score-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;font-size:24px;line-height:1.2}
+  .score-grid .label{font-weight:700;color:#e8f5e9}
+  .score-grid .value{font-weight:700}
+  .layout{display:grid;grid-template-columns: 1fr 420px 1fr;grid-template-areas:"enemy enemy enemy" "deck center pile" "status status status" "picker picker picker" "player player player";gap:18px;align-items:center}
+  .enemy-box,.player-box{justify-self:center;width:min(1020px, 100%);background:linear-gradient(180deg, rgba(255,248,235,.05), rgba(46,26,15,.08)), var(--panel);border-radius:20px;padding:16px 22px;border:1px solid rgba(255,228,188,.08);backdrop-filter:blur(1px)}
+  .enemy-box{grid-area:enemy;min-height:150px}
+  .player-box{grid-area:player;min-height:180px}
+  .name-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:20px;font-weight:700}
+  .cards-row{display:flex;gap:0;min-height:126px;align-items:flex-end;justify-content:center;flex-wrap:nowrap}
+  .cards-row.enemy .card-slot{margin-left:-18px}
+  .cards-row.player .card-slot{margin-left:-10px}
+  .cards-row .card-slot:first-child{margin-left:0}
+  .center-deck{grid-area:deck;justify-self:end;display:flex;gap:24px;align-items:center}
+  .pile-box{grid-area:pile;justify-self:start;min-width:330px;min-height:170px;display:flex;align-items:center;justify-content:flex-start}
+  .status{grid-area:status;justify-self:center;width:min(1020px, 100%);background:linear-gradient(180deg, rgba(244,229,199,.94), rgba(220,200,160,.94));color:#111;padding:14px 20px;border-radius:12px;font-size:20px;box-shadow:var(--shadow)}
+  .status .sub{display:block;margin-top:8px;font-size:18px;color:#4a3f18;font-weight:700;white-space:pre-line}
+  .picker-inline{grid-area:picker;justify-self:center;display:none;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;width:min(960px, 100%);background:rgba(255,255,255,.08);border-radius:14px;padding:12px;position:relative;z-index:20}
+  .picker-inline.show{display:flex;position:relative;z-index:5}
+  .picker-inline .picker-title{font-size:20px;margin-right:10px}
+  .picker-inline button{background:#d7cf5a;color:#111}
+  .deck-stack{position:relative;width:520px;height:170px}
+  .stack-count{text-align:center;margin-top:8px;font-size:20px;color:#eef5ee;font-weight:700}
+  .pile-stack{position:relative;width:330px;height:170px}
+  .pile-stack .card{position:absolute;left:0;top:0}
+  .card-slot{position:relative}
+  .card{width:var(--card-w);height:var(--card-h);border-radius:7px;background:#fff;color:#111;border:1px solid rgba(0,0,0,.28);position:relative;box-shadow:0 6px 12px rgba(0,0,0,.28);overflow:hidden;user-select:none}
+  .card.faceup.playable{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+  .card.faceup.playable:hover{transform:translateY(-10px);box-shadow:0 12px 18px rgba(0,0,0,.34)}
+  .card.back{background:
+      linear-gradient(135deg, rgba(255,255,255,.18) 25%, transparent 25%) -8px 0/16px 16px,
+      linear-gradient(225deg, rgba(255,255,255,.18) 25%, transparent 25%) -8px 0/16px 16px,
+      linear-gradient(315deg, rgba(255,255,255,.18) 25%, transparent 25%) 0px 0/16px 16px,
+      linear-gradient(45deg, rgba(255,255,255,.18) 25%, transparent 25%) 0px 0/16px 16px,
+      var(--blue-back)}
+  .card.back::before{content:"";position:absolute;inset:8px;border:2px solid rgba(255,255,255,.88);border-radius:5px}
+  .card.back::after{content:"◈";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;opacity:.9}
+  .corner{position:absolute;left:6px;top:5px;line-height:.95;text-align:center;font-weight:700}
+  .corner.bottom{left:auto;top:auto;right:6px;bottom:5px;transform:rotate(180deg)}
+  .rank{font-size:22px}.suit{font-size:20px}
+  .center-symbol{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700}
+  .red{color:#d81f1f}.black{color:#111}
+  .small-note{text-align:center;margin-top:12px}
+  .legend{display:flex;justify-content:center;gap:14px;margin-top:8px;flex-wrap:wrap;color:#edf4ed;font-size:16px}
+  .netpanel{margin-top:16px;background:linear-gradient(180deg, rgba(255,247,231,.05), rgba(52,29,17,.10)), rgba(52,29,17,.42);padding:14px 16px;border-radius:16px;border:1px solid rgba(255,228,188,.08);backdrop-filter:blur(1px)}
+  .netpanel details summary{cursor:pointer;font-weight:700}
+  .netgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+  .netlog{white-space:pre-wrap;background:rgba(0,0,0,.22);padding:12px;border-radius:12px;font-family:Consolas,monospace;font-size:13px;max-height:220px;overflow:auto}
+  .server-row{display:grid;grid-template-columns:180px 1fr 140px auto;gap:8px;align-items:center;margin:10px 0 12px}
+  .server-row select,.server-row input{min-width:0}
+  .subpanel{margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px}
+
+  .round-end{position:fixed;right:18px;bottom:18px;background:rgba(7,20,12,.96);color:#fff;padding:16px 18px;border-radius:16px;box-shadow:0 14px 28px rgba(0,0,0,.45);width:min(420px, calc(100vw - 36px));display:none;z-index:30}
+  .round-end.show{display:block}
+  .round-end h4{margin:0 0 10px;font-size:28px}
+  .round-end .lines{white-space:pre-line;font-size:18px;line-height:1.45}
+  .round-end .actions{text-align:right;margin-top:12px}
+  .round-end button{background:#f3e08d;color:#111;border:none;border-radius:10px;padding:10px 14px;font-size:18px;cursor:pointer}
+  .history-box{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(7,20,12,.98);color:#fff;padding:16px 18px;border-radius:16px;box-shadow:0 14px 28px rgba(0,0,0,.45);display:none;z-index:1001;max-width:min(980px, calc(100vw - 36px));width:min(980px, calc(100vw - 36px));pointer-events:auto}
+  .history-box.show{display:block}
+  .history-box h4{margin:0 0 10px;font-size:28px}
+  .history-box .lines{white-space:pre-wrap;font-size:18px;line-height:1.45;max-height:60vh;overflow:auto;font-family:Consolas,monospace}
+  .history-box .actions{text-align:right;margin-top:12px}
+  .history-box button{background:#f3e08d;color:#111;border:none;border-radius:10px;padding:10px 14px;font-size:18px;cursor:pointer}
+
+
+  .layout{position:relative}
+  .layout > *{position:relative;z-index:1}
+.table-watermark{position:absolute;left:0;right:0;top:102px;bottom:300px;display:flex;align-items:center;justify-content:center;transform:translateX(26px);pointer-events:none;user-select:none;z-index:0;color:rgba(244,223,198,.56);text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;filter:drop-shadow(0 2px 1px rgba(255,240,220,.18))}
+  .table-watermark .wm-101-wrap{display:flex;align-items:center;gap:26px;font-size:clamp(56px,7vw,94px);font-weight:900;letter-spacing:.02em}
+  .table-watermark .wm-101{line-height:1;color:rgba(248,231,208,.72);text-shadow:0 1px 0 rgba(255,248,235,.55),0 -1px 0 rgba(78,47,28,.72),0 2px 0 rgba(118,82,58,.28),0 8px 18px rgba(44,22,11,.42)}
+  .table-watermark .wm-line{width:110px;height:3px;background:linear-gradient(90deg, rgba(244,223,198,.0), rgba(244,223,198,.72), rgba(244,223,198,.0));box-shadow:0 1px 0 rgba(255,246,230,.18),0 3px 8px rgba(26,12,7,.25);border-radius:999px}
+  .table-watermark .wm-bridge{font-size:clamp(68px,8.7vw,116px);font-weight:900;letter-spacing:.018em;line-height:.92;color:rgba(248,231,208,.70);text-shadow:0 1px 0 rgba(255,248,235,.56),0 -1px 0 rgba(78,47,28,.74),0 2px 0 rgba(118,82,58,.28),0 9px 20px rgba(44,22,11,.44)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>CZ Durak client_46</h1>
+
+  <div class="topbar">
+    <button class="btn-log" id="logToggleBtn" type="button" style="display:none">ЛОГ OFF</button>
+    <button class="btn-log" id="historyBtn" type="button">История</button>
+    <button class="btn-log" id="debugToggleBtn" type="button" style="display:none">DEBUG OFF</button>
+    <button class="btn-log" id="rulesBtn" type="button">Rules</button>
+    <button class="btn-bg" id="bgCycleBtn" type="button">BG</button>
+    <span id="connStateText">No connection</span>
+  </div>
+
+  <div class="scoreboard">
+    <div class="score-card">
+      <div class="score-head"><h3>Соперник</h3><div id="enemyCountTop" class="count-badge">—</div></div>
+      <div class="score-grid">
+        <div class="label">Общий счёт</div><div class="value" id="enemyTotalScore">0</div>
+        <div class="label">Раунд</div><div class="value" id="enemyRoundScore">—</div>
+        <div class="label">Ход</div><div class="value" id="enemyTurnValue">—</div>
+      </div>
+    </div>
+    <div class="score-card">
+      <div class="score-head"><h3>Вы</h3><div id="playerCountTop" class="count-badge">—</div></div>
+      <div class="score-grid">
+        <div class="label">Общий счёт</div><div class="value" id="playerTotalScore">0</div>
+        <div class="label">Раунд</div><div class="value" id="playerRoundScore">—</div>
+        <div class="label">Ход</div><div class="value" id="playerTurnValue">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div id="variantWatermark" class="table-watermark" aria-hidden="true">101</div>
+    <div class="enemy-box">
+      <div class="name-row"><div>Соперник</div><div id="enemyCount"></div></div>
+      <div class="cards-row enemy" id="enemyRow"></div>
+    </div>
+
+    <div class="center-deck">
+      <div><div class="deck-stack" id="deckStack"></div><div class="stack-count" id="deckCount"></div></div>
+    </div>
+
+    <div class="pile-box">
+      <div class="pile-stack" id="pileStack"></div>
+    </div>
+
+    <div class="status">
+      <span id="statusMain">Сначала вставьте offer от host и примените его.</span>
+      <span class="sub" id="statusSub"></span>
+    </div>
+
+	<div class="picker-inline" id="pickerInline">
+ 	 <div class="picker-title" style="font-size:26px;">Выберите масть:</div>
+ 	 <button data-suit="clubs" style="font-size:26px;">Трефы ♣</button>
+ 	 <button data-suit="diamonds" style="font-size:26px;">Бубны ♦</button>
+ 	 <button data-suit="hearts" style="font-size:26px;">Червы ♥</button>
+ 	 <button data-suit="spades" style="font-size:26px;">Пики ♠</button>
+	</div>
+
+    <div class="player-box">
+      <div class="name-row"><div>Вы</div><div id="playerCount"></div></div>
+      <div class="cards-row player" id="playerRow"></div>
+      <div class="small-note"><button class="btn-draw" id="drawBtn">Взять из колоды</button></div>
+      <div class="legend">
+        <div>Client отправляет действия host.</div>
+        <div>После ответа host state обновляется автоматически.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="netpanel">
+    <details>
+      <summary>Connection</summary>
+      <div class="server-row">
+        <select id="signalPreset">
+          <option value="railway" selected>WAN / Railway</option>
+          <option value="localhost">LAN / localhost</option>
+          <option value="custom">Custom</option>
+        </select>
+        <input id="signalUrl" type="text" value="wss://bubbly-tranquility-production.up.railway.app" placeholder="wss://...">
+        <input id="signalRoom" type="text" value="42" placeholder="Комната">
+        <button class="btn-log" id="signalClientBtn" type="button">Сервер: client</button>
+      </div>
+
+      <div class="subpanel">
+        <div class="row" style="margin-bottom:8px">
+          <button class="btn-log" id="copyLogBtn" type="button">Copy log</button>
+          <button class="btn-log" id="clearLogBtn" type="button">Clear log</button>
+          <button class="btn-log" id="pongBtn" type="button">PONG</button>
+        </div>
+        <div id="netLog" class="netlog"></div>
+      </div>
+
+      <details class="subpanel">
+        <summary>Manual offer mode</summary>
+        <div class="netgrid">
+        <div>
+          <div class="row" style="margin-bottom:8px">
+            <button class="btn-log" id="pasteOfferBtn" type="button">Paste</button>
+            <button class="btn-log" id="applyOfferBtn" type="button">Apply offer</button>
+          </div>
+          <textarea id="offerIn" placeholder="Вставьте сюда offer от host вручную (Ctrl+V)"></textarea>
+        </div>
+        <div>
+          <div class="row" style="margin-bottom:8px">
+            <button class="btn-log" id="copyAnswerBtn" type="button">Copy</button>
+          </div>
+          <textarea id="answerOut" readonly placeholder="Answer для host (копировать кнопкой Copy)"></textarea>
+        </div>
+      </div>
+      </details>
+    </details>
+  </div>
+</div>
+
+<div id="rulesBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:1000"></div>
+<div class="history-box" id="rulesPanel">
+  <h4>Rules</h4>
+  <div class="lines" id="rulesLines"></div>
+  <div class="actions"><button id="closeRulesBtn" type="button">Закрыть</button></div>
+</div>
+
+<div class="round-end" id="roundEndPanel">
+  <h4 id="roundEndTitle">Сет завершён</h4>
+  <div class="lines" id="roundEndLines"></div>
+  <div class="actions"><button id="closeRoundEndBtn" type="button">Закрыть</button></div>
+</div>
+
+<div id="historyBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:1000"></div>
+<div class="history-box" id="historyPanel">
+  <h4>История счёта</h4>
+  <div class="lines" id="historyLines"></div>
+  <div class="actions"><button id="closeHistoryBtn" type="button">Закрыть</button></div>
+</div>
+
+<script>
+const APP_VERSION = 'CZ Durak client_46.01';
+const suits = [
+  { key: 'clubs', symbol: '♣', color: 'black', label: 'Трефы' },
+  { key: 'diamonds', symbol: '♦', color: 'red', label: 'Бубны' },
+  { key: 'hearts', symbol: '♥', color: 'red', label: 'Червы' },
+  { key: 'spades', symbol: '♠', color: 'black', label: 'Пики' }
+];
+const state = {
+  role: 'client',
+  deck: [], playerHand: [], enemyHand: [], pile: [],
+  showEnemy: false, showDeck: false, forcedSuit: null, pendingSuitChoice: false,
+  pendingSuitChoiceRole: null, turn: null, gameStarted: false, roundEnded: false,
+  scores: { playerTotal: 0, enemyTotal: 0, playerRound: 0, enemyRound: 0 }, history: [], matchOver: false, roundEndInfo: null,
+  logEnabled: false, debugEnabled: false, dragIndex: null,
+  signaling: { ws: null, url: 'ws://localhost:8787', room: '', connected: false },
+  connectionReady: false, pc: null, dc: null, rules: { gameVariant: '101' },
+  signalConnecting: false,
+  answerSent: false,
+  lastRemoteOfferSdp: '',
+  classicLog: '',
+  lastRejectInfo: '',
+  bgFiles: [],
+  bgIndex: -1,
+  bgName: '',
+  pendingBgName: '',
+  awaitingState: false,
+  connection: {
+    attemptId: 0, stage: 'idle', wsState: 'closed', peerState: 'idle', dcState: 'closed',
+    offerId: '', helloSent: false, helloReceived: false, startedAt: 0, helloAt: 0,
+    lastError: '', timers: { hello: null, retry: null }, transportPolicy: 'all'
+  },
+};
+const $ = (id) => document.getElementById(id);
+const NL = String.fromCharCode(10);
+const SERVER_PRESETS = { railway: 'wss://bubbly-tranquility-production.up.railway.app', localhost: 'ws://localhost:8787' };
+const ACTION_DELAY_MS = 900;
+const VERSION_NUM = ((APP_VERSION.match(/(\d+)/g) || []).pop()) || '0';
+
+const BG_FILE_RE = /\.(jpe?g|png|webp)$/i;
+const DEFAULT_BUTTON_BG_CANDIDATES = (() => {
+  const items = [
+    'Pics/Buttons/button_bg.jpg','Pics/Buttons/button_bg.jpeg','Pics/Buttons/button_bg.png','Pics/Buttons/button_bg.webp',
+    'Pics/Buttons/bg.jpg','Pics/Buttons/bg.jpeg','Pics/Buttons/bg.png','Pics/Buttons/bg.webp',
+    'Pics/Buttons/buttons.jpg','Pics/Buttons/buttons.jpeg','Pics/Buttons/buttons.png','Pics/Buttons/buttons.webp'
+  ];
+  const exts = ['jpg','jpeg','png','webp'];
+  const prefixes = ['button_bg','btn','button','bg'];
+  for (const prefix of prefixes){
+    for (let i = 1; i <= 40; i++){
+      for (const ext of exts) items.push(`Pics/Buttons/${prefix}${i}.${ext}`);
+    }
+  }
+  return items;
+})();
+const DEFAULT_TABLE_BG_MANIFESTS = ['Pics/backgrounds.json','Pics/list.json','Pics/bg.json'];
+
+const DEFAULT_TABLE_BG_CANDIDATES = (() => {
+  const items = [];
+  const exts = ['jpg','jpeg','png','webp'];
+  const prefixes = ['','bg','table','leather','skin','pic'];
+  for (const prefix of prefixes){
+    for (let i = 1; i <= 200; i++){
+      const stem = `${prefix}${i}`;
+      for (const ext of exts) items.push(`Pics/${stem}.${ext}`);
+    }
+  }
+  return items;
+})();
+
+function probeImage(url){
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(url);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+async function firstExisting(candidates){
+  for (const candidate of candidates){
+    const hit = await probeImage(candidate);
+    if (hit) return hit;
+  }
+  return null;
+}
+function setButtonBackground(url){
+  document.documentElement.style.setProperty('--button-bg-image', url ? `url("${url}")` : 'none');
+}
+async function loadDefaultButtonBackground(){
+  const url = await firstExisting(DEFAULT_BUTTON_BG_CANDIDATES);
+  setButtonBackground(url);
+}
+function normalizeBgList(items){
+  return Array.from(new Set((items || []).map(item => String(item || '').trim()).filter(item => BG_FILE_RE.test(item)))).map(item => item.replace(/\\/g,'/'));
+}
+async function tryLoadManifest(url){
+  try{
+    const res = await fetch(url, {cache:'no-store'});
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (Array.isArray(data)) return normalizeBgList(data).map(name => name.startsWith('Pics/') ? name : `Pics/${name}`);
+    if (data && Array.isArray(data.files)) return normalizeBgList(data.files).map(name => name.startsWith('Pics/') ? name : `Pics/${name}`);
+  }catch(e){}
+  return null;
+}
+async function loadDefaultTableBackgrounds(){
+  let urls = null;
+  for (const manifest of DEFAULT_TABLE_BG_MANIFESTS){
+    urls = await tryLoadManifest(manifest);
+    if (urls && urls.length) break;
+  }
+  if ((!urls || !urls.length) && DEFAULT_TABLE_BG_CANDIDATES.length){
+    const hits = [];
+    for (const candidate of DEFAULT_TABLE_BG_CANDIDATES){
+      const hit = await probeImage(candidate);
+      if (hit) hits.push(hit);
+    }
+    urls = hits;
+  }
+  if (!urls || !urls.length){
+    updateBgButton();
+    return;
+  }
+  state.bgFiles = urls.map(url => ({name: url.split('/').pop(), url}));
+  if (state.bgFiles.length){
+    state.pendingBgName = state.rules.tableBgName || state.bgName || state.bgFiles[0].name;
+    applyPendingBackground();
+  } else {
+    updateBgButton();
+  }
+}
+
+const RULES_TEXT = `В Чешского дурака играют два игрока. Смысл игры - сбросить все карты с рук и посчитать по очкам оставшиеся карты у противника. Проигравшим считается игрок, первым набравший больше 101 очков.
+Игроки по-очереди делают ходы, сбрасывая карты в стопку на игровом столе. Первый ходит любой картой, следующий должен положить карту той же масти или того же достоинства, что и карта, лежащая сверху стопки. Например, если на столе лежит Валет пик, то на него можно сбросить, либо Валета, либо любую карту масти пик (либо Даму любой масти. см. ниже). Если нечем ходить, набираются карты из колоды до тех пор, пока не выпадет нужная карта.
+Когда карты в колоде заканчиваются, то сброшенные карты, кроме последней, переворачиваются, перемешиваются и кладутся на место колоды (тем самым из колоды опять можно добирать карты)
+Здесь два варианта игры Чешский дурак: «101» и «Бридж». (вариант игры выбирает хост)
+В зависимости от того, какую карту сбрывает игрок, для его соперника наступают различные последствия:
+Вариант игры «101»:
+· шестёрка – соперник берёт одну карту из колоды и пропускает ход
+· семёрка – берёт две карты и пропускает ход
+· Король червей – берёт четыре карты и пропускает ход
+· Туз – соперник пропускает ход
+· Дама – назначает масть
+
+Вариант игры «Бридж»:
+· шестёрка – берёт четыре карты из колоды и пропускает ход
+· семёрка – берёт две карты и НЕ пропускает ход
+· туз – соперник пропускает ход
+· Дама – назначает масть
+
+Даму любой масти можно выкладывать на любую карту, при этом игрок, выложивший Даму, заказывает масть, с которой должен зайти соперник (появляется окно с выбором масти).
+
+Подсчёт очков
+Когда у кого-то из игроков заканчиваются карты, значит соперник проиграл раунд и его карты пересчитываются:
+· Валет – 2 очка
+· Дама – 3 очка
+· Король – 4 очка
+· Туз – 11 очков
+· остальные карты по цифровому номиналу. (например шестёрка это 6 очков)
+
+Если один игрок сбросил все карты, а у соперника на руках осталась всего одна карта Дама (кроме Дамы пик), то прибавляется 20 очков к счёту соперника.
+Если на руках осталась всего одна карта Дама пик, то прибавляется 40 очков.
+Если игрок закончил раунд картой Дама (кроме Дамы пик), то с его счёта списывается 20 очков (минус 20).
+Если игрок закончил раунд на Даму пик, то с его счёта списывается 40 очков (минус 40).
+
+Тот, кто выиграл раунд (сет), тот ходит в следующем раунде первым (зависит от настроек на хосте).
+Игрок, первым набравший больше 101 очков, считается проигравшим.
+Важный бонус: У игрока, набравшего 101 очко ровно, все очки обнуляются (в ноль) и игра продолжается.`;
+
+function showRoundEnd(title, lines){
+  $('roundEndTitle').textContent = title;
+  $('roundEndLines').textContent = lines;
+  $('roundEndPanel').classList.add('show');
+}
+function hideRoundEnd(){ $('roundEndPanel').classList.remove('show'); }
+
+function netTime(){
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function logNet(msg){
+  $('netLog').textContent += `${netTime()}  ${msg}\n`;
+  $('netLog').scrollTop = $('netLog').scrollHeight;
+}
+function setConnText(){ $('connStateText').textContent = state.connectionReady ? 'Connected' : 'No connection'; }
+function suitInfo(key){ return suits.find(s => s.key === key); }
+function cardText(card){ return `${card.rank}${suitInfo(card.suit).symbol}`; }
+function lastPileCard(){ return state.pile.length ? state.pile[state.pile.length - 1] : null; }
+function setStatus(main, sub=''){
+  $('statusMain').textContent = main;
+  const parts = [];
+  if (sub) parts.push(sub);
+  const forcedLine = state.forcedSuit ? `Заказана масть: ${suitInfo(state.forcedSuit).label}.` : '';
+  if (forcedLine && !(main || '').includes(forcedLine) && !(sub || '').includes(forcedLine)) parts.push(forcedLine);
+  $('statusSub').textContent = parts.join('\n');
+}
+function canPlayOnTop(card, topCard, forcedSuit){
+  if (!topCard) return true;
+  if (card.rank === 'Q') return true;
+  if (forcedSuit) return card.rank === 'Q' || card.suit === forcedSuit;
+  return card.suit === topCard.suit || card.rank === topCard.rank;
+}
+function getPlayableCards(hand){
+  const top = lastPileCard();
+  return hand.filter(card => canPlayOnTop(card, top, state.forcedSuit));
+}
+function shouldEnableDraw(hand){
+  if (state.roundEnded || !state.gameStarted) return false;
+  return getPlayableCards(hand).length < Number(state.rules.drawDisabledAtPlayableCount || 2);
+}
+function createCardElement(card, opts = {}){
+  const { faceUp = true, clickable = false, playable = false, clickHandler = null } = opts;
+  const div = document.createElement('div');
+  div.className = `card ${faceUp ? 'faceup' : 'back'} ${faceUp && playable ? 'playable' : ''}`;
+  if (!faceUp) return div;
+  const suit = suitInfo(card.suit);
+  const colorClass = suit.color;
+  const top = document.createElement('div');
+  top.className = `corner ${colorClass}`;
+  top.innerHTML = `<div class="rank">${card.rank}</div><div class="suit">${suit.symbol}</div>`;
+  const bottom = document.createElement('div');
+  bottom.className = `corner bottom ${colorClass}`;
+  bottom.innerHTML = `<div class="rank">${card.rank}</div><div class="suit">${suit.symbol}</div>`;
+  const center = document.createElement('div');
+  center.className = `center-symbol ${colorClass}`;
+  center.textContent = suit.symbol;
+  div.append(top, center, bottom);
+  if (clickable && clickHandler) div.addEventListener('click', clickHandler);
+  return div;
+}
+
+
+function updateBgButton(){
+  const btn = $('bgCycleBtn');
+  if (!btn) return;
+  btn.textContent = state.bgFiles.length ? `BG ${state.bgIndex + 1}/${state.bgFiles.length}` : 'BG';
+}
+function cycleBackgrounds(){
+  if (!state.bgFiles || !state.bgFiles.length){
+    updateBgButton();
+    return;
+  }
+  applyBackgroundIndex(state.bgIndex + 1, false);
+}
+function setBodyBackground(url){
+  document.documentElement.style.setProperty('--page-bg-image', url ? `url("${url}")` : "radial-gradient(circle at 30% 26%, #eadbc0 0%, #d3b186 34%, #b17d56 68%, #8e6140 100%)");
+}
+function normalizeBgName(name){ return String(name || '').trim().toLowerCase(); }
+function findBgIndexByName(name){
+  const needle = normalizeBgName(name);
+  if (!needle) return -1;
+  return state.bgFiles.findIndex(item => normalizeBgName(item.name) === needle);
+}
+function applyBackgroundIndex(index, sync){
+  if (!state.bgFiles.length) return;
+  const len = state.bgFiles.length;
+  state.bgIndex = ((index % len) + len) % len;
+  const item = state.bgFiles[state.bgIndex];
+  state.bgName = item.name;
+  state.pendingBgName = item.name;
+  setBodyBackground(item.url);
+  updateBgButton();
+
+}
+function applyPendingBackground(){
+  const idx = findBgIndexByName(state.pendingBgName || state.bgName);
+  if (idx >= 0) applyBackgroundIndex(idx, false);
+  else updateBgButton();
+}
+function loadBackgroundFiles(fileList){
+  const files = Array.from(fileList || []).filter(file => BG_FILE_RE.test(file.name)).sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric:true, sensitivity:'base'}));
+  if (!files.length){
+    return;
+  }
+  if (state.bgFiles.length) state.bgFiles.forEach(item => { if (item.objectUrl){ try{ URL.revokeObjectURL(item.url); }catch(e){} } });
+  state.bgFiles = files.map(file => ({name:file.name, url:URL.createObjectURL(file), objectUrl:true}));
+  if (!state.pendingBgName && !state.bgName) state.pendingBgName = state.bgFiles[0].name;
+  applyPendingBackground();
+}
+function renderEnemy(){
+  const row = $('enemyRow'); row.innerHTML = '';
+  state.enemyHand.forEach(card => {
+    const slot = document.createElement('div'); slot.className = 'card-slot';
+    const faceUp = state.showEnemy;
+    const el = createCardElement(card, { faceUp });
+    slot.appendChild(el); row.appendChild(slot);
+  });
+  $('enemyCount').textContent = `${state.enemyHand.length} карт`;
+  $('enemyCountTop').textContent = `${state.enemyHand.length} карт`;
+  $('enemyTurnValue').textContent = state.turn === 'enemy' ? 'да' : 'нет';
+  $('enemyTotalScore').textContent = state.scores.enemyTotal;
+  $('enemyRoundScore').textContent = state.scores.enemyRound;
+}
+function renderPlayer(){
+  const row = $('playerRow'); row.innerHTML = '';
+  const playable = getPlayableCards(state.playerHand);
+  state.playerHand.forEach((card, index) => {
+    const slot = document.createElement('div'); slot.className = 'card-slot'; slot.dataset.index = index;
+    const el = createCardElement(card, {
+      faceUp: true,
+      clickable: true,
+      playable: state.turn === 'player' && !state.pendingSuitChoice && playable.includes(card),
+      clickHandler: () => clientPlay(index)
+    });
+    el.draggable = true;
+    el.addEventListener('dragstart', () => { state.dragIndex = index; });
+    slot.addEventListener('dragover', (e) => e.preventDefault());
+    slot.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (state.dragIndex === null || state.dragIndex === index) return;
+      const original = state.playerHand.map((_, i) => i);
+      const movedCard = state.playerHand.splice(state.dragIndex, 1)[0];
+      const movedIdx = original.splice(state.dragIndex, 1)[0];
+      state.playerHand.splice(index, 0, movedCard);
+      original.splice(index, 0, movedIdx);
+      state.dragIndex = null;
+      render();
+      sendMessage({type:'client_reorder', order: original});
+    });
+    slot.appendChild(el); row.appendChild(slot);
+  });
+  $('playerCount').textContent = `${state.playerHand.length} карт`;
+  $('playerCountTop').textContent = `${state.playerHand.length} карт`;
+  $('playerTurnValue').textContent = state.turn === 'player' ? 'да' : 'нет';
+  $('playerTotalScore').textContent = state.scores.playerTotal;
+  $('playerRoundScore').textContent = state.scores.playerRound;
+}
+function renderDeck(){
+  const deckStack = $('deckStack'); deckStack.innerHTML = '';
+  if (state.deck.length === 0){ deckStack.textContent = 'Колода пуста'; return; }
+  if (state.showDeck){
+    const cards = state.deck.slice();
+    const maxShown = cards.length;
+    const gap = maxShown > 30 ? 14 : maxShown > 24 ? 16 : maxShown > 18 ? 18 : 22;
+    deckStack.style.width = `${Math.max(520, 86 + (maxShown - 1) * gap)}px`;
+    cards.forEach((card, idx) => {
+      const el = createCardElement(card, { faceUp: true });
+      el.style.position = 'absolute'; el.style.left = `${idx * gap}px`; el.style.top = `${Math.max(0, (maxShown - idx - 1) * 0.25)}px`; el.style.transform = 'scale(0.88)';
+      deckStack.appendChild(el);
+    });
+  } else {
+    for (let i=Math.min(state.deck.length,8)-1;i>=0;i--){ const el = createCardElement(null,{faceUp:false}); el.style.position='absolute'; el.style.top=`${i*2}px`; el.style.left=`${i*2}px`; deckStack.appendChild(el); }
+  }
+  $('deckCount').textContent = `В колоде: ${state.deck.length}`;
+}
+function renderPile(){
+  const pile = $('pileStack'); pile.innerHTML = '';
+  const visible = state.pile.slice(-18);
+  const gap = visible.length > 14 ? 16 : visible.length > 10 ? 18 : 22;
+  visible.forEach((card, idx) => {
+    const el = createCardElement(card, { faceUp: true });
+    el.style.transform = `translate(${idx * gap}px, ${idx * 1.5}px) scale(0.9)`;
+    pile.appendChild(el);
+  });
+}
+function updateVariantWatermark(){
+  const mode = (state.rules && state.rules.gameVariant) === 'bridge' ? 'bridge' : '101';
+  const wm = $('variantWatermark');
+  if (!wm) return;
+  if (mode === 'bridge') wm.innerHTML = '<div class="wm-bridge">BRIDGE</div>';
+  else wm.innerHTML = '<div class="wm-101-wrap"><span class="wm-line"></span><span class="wm-101">101</span><span class="wm-line"></span></div>';
+}
+function renderControls(){ $('drawBtn').disabled = !(state.gameStarted && !state.roundEnded && !state.matchOver && state.turn === 'player' && !state.pendingSuitChoice && shouldEnableDraw(state.playerHand)); }
+function render(){ updateVariantWatermark(); renderEnemy(); renderPlayer(); renderDeck(); renderPile(); renderControls(); setConnText(); }
+
+
+function applySignalPreset(){
+  const preset = $('signalPreset');
+  const url = $('signalUrl');
+  if (!preset || !url) return;
+  if (preset.value === 'railway') url.value = SERVER_PRESETS.railway;
+  else if (preset.value === 'localhost') url.value = SERVER_PRESETS.localhost;
+}
+function showRulesPanel(){
+  $('rulesLines').textContent = state.rulesText || RULES_TEXT;
+  if ($('rulesBackdrop')) $('rulesBackdrop').style.display = 'block';
+  $('rulesPanel').classList.add('show');
+}
+function hideRulesPanel(){
+  $('rulesPanel').classList.remove('show');
+  if ($('rulesBackdrop')) $('rulesBackdrop').style.display = 'none';
+}
+function historyText(){
+  if (state.scoreHistory) return state.scoreHistory;
+  return 'История пуста.';
+}
+function showHistoryPanel(){
+  $('historyLines').textContent = historyText();
+  if ($('historyBackdrop')) $('historyBackdrop').style.display = 'block';
+  $('historyPanel').classList.add('show');
+}
+function hideHistoryPanel(){
+  $('historyPanel').classList.remove('show');
+  if ($('historyBackdrop')) $('historyBackdrop').style.display = 'none';
+}
+async function pasteFromClipboard(targetId){
+  try{
+    const text = await navigator.clipboard.readText();
+    if (!text) throw new Error('clipboard empty');
+    $(targetId).value = text;
+    logNet('[paste] ' + targetId);
+  }catch(e){
+    $(targetId).focus();
+    $(targetId).select();
+    logNet('[paste unavailable] Вставьте текст вручную в ' + targetId);
+  }
+}
+
+function applyRemoteState(payload){
+  state.rules = payload.rules || {};
+  state.deck = payload.deck || [];
+  state.playerHand = payload.enemyHand || [];   // client sees own hand as playerHand
+  state.enemyHand = payload.playerHand || [];   // host hand as enemyHand
+  state.pile = payload.pile || [];
+  state.showEnemy = !!payload.roundEnded;
+  state.showDeck = false;
+  state.forcedSuit = payload.forcedSuit || null;
+  state.pendingSuitChoice = !!payload.pendingSuitChoice;
+  state.pendingSuitChoiceRole = payload.pendingSuitChoiceRole || null;
+  state.turn = payload.turn === 'player' ? 'enemy' : (payload.turn === 'enemy' ? 'player' : payload.turn);
+  state.gameStarted = payload.gameStarted;
+  state.roundEnded = payload.roundEnded;
+  state.scores = payload.scores || state.scores;
+  state.history = payload.history || state.history;
+  state.matchOver = !!payload.matchOver;
+  state.roundEndInfo = payload.roundEndInfo || null;
+  state.classicLog = payload.classicLog || state.classicLog;
+  state.connectionLog = payload.connectionLog || state.connectionLog || '';
+  state.scoreHistory = payload.scoreHistory || state.scoreHistory;
+  state.rulesText = payload.rulesText || state.rulesText || RULES_TEXT;
+  state.rules.tableBgName = (payload.rules && payload.rules.tableBgName) || state.rules.tableBgName || '';
+  state.pendingBgName = state.rules.tableBgName || state.pendingBgName;
+  applyPendingBackground();
+  let mainText = (!state.gameStarted || state.roundEnded) ? 'Партия завершена.' : (payload.lastAction ? `Последнее действие: ${payload.lastAction}` : 'Получено новое состояние.');
+  let subText = (!state.gameStarted || state.roundEnded) ? 'Нажмите NEXT SET или NEW GAME на стороне host.' : (state.turn === 'player' ? 'Сейчас ваш ход.' : 'Сейчас ход host.');
+  const clientMustChooseSuit = state.pendingSuitChoice && state.pendingSuitChoiceRole === 'enemy';
+  if (clientMustChooseSuit){
+    mainText = 'Выберите масть.';
+    subText = 'После дамы нужно заказать масть.';
+  } else if (state.pendingSuitChoice){
+    subText = 'Host выбирает масть...';
+  }
+  setStatus(mainText, subText);
+  $('pickerInline').classList.toggle('show', clientMustChooseSuit);
+  if (state.roundEndInfo) showRoundEnd(state.roundEndInfo.title, state.roundEndInfo.lines); else hideRoundEnd();
+  render();
+}
+function clearTimer(ref){
+  if (ref) clearTimeout(ref);
+  return null;
+}
+function cancelClientConnectTimers(){
+  state.connection.timers.hello = clearTimer(state.connection.timers.hello);
+  state.connection.timers.retry = clearTimer(state.connection.timers.retry);
+}
+function resetClientConnectionFlow(){
+  cancelClientConnectTimers();
+  state.connection.stage = 'idle';
+  state.connection.peerState = 'idle';
+  state.connection.dcState = 'closed';
+  state.connection.offerId = '';
+  state.connection.helloSent = false;
+  state.connection.helloReceived = false;
+  state.connection.startedAt = 0;
+  state.connection.helloAt = 0;
+  state.connection.lastError = '';
+  state.connection.transportPolicy = 'all';
+}
+function clientElapsed(){
+  return state.connection.startedAt ? (Date.now() - state.connection.startedAt) : 0;
+}
+function clientConnSnapshot(){
+  const pc = state.pc;
+  return `attempt=${state.connection.attemptId} stage=${state.connection.stage} ws=${state.connection.wsState} peer=${state.connection.peerState} dc=${state.connection.dcState} sig=${pc ? pc.signalingState : '-'} ice=${pc ? pc.iceConnectionState : '-'} pc=${pc ? pc.connectionState : '-'} gather=${pc ? pc.iceGatheringState : '-'} policy=${state.connection.transportPolicy}`;
+}
+function logConn(event, details=''){
+  const extra = details ? ` | ${details}` : '';
+  logNet(`[conn] ${event} | ${clientConnSnapshot()} | t=${clientElapsed()}ms${extra}`);
+}
+async function logPeerStats(tag){
+  if (!state.pc || typeof state.pc.getStats !== 'function') return;
+  try{
+    const stats = await state.pc.getStats();
+    let selected = null;
+    let local = null;
+    let remote = null;
+    stats.forEach(report => {
+      if (!selected && report.type === 'transport' && report.selectedCandidatePairId) selected = stats.get(report.selectedCandidatePairId);
+    });
+    if (!selected){
+      stats.forEach(report => {
+        if (!selected && report.type === 'candidate-pair' && (report.selected || report.nominated || report.state === 'succeeded')) selected = report;
+      });
+    }
+    if (selected){
+      local = stats.get(selected.localCandidateId);
+      remote = stats.get(selected.remoteCandidateId);
+      logNet(`[stats] ${tag} pair=${selected.state || '-'} local=${local ? (local.candidateType + '/' + (local.protocol || '-')) : '-'} remote=${remote ? (remote.candidateType + '/' + (remote.protocol || '-')) : '-'} rtt=${selected.currentRoundTripTime ?? '-'}`);
+    } else {
+      logNet(`[stats] ${tag} pair=none`);
+    }
+  }catch(e){
+    logNet('[stats error] ' + e.message);
+  }
+}
+function updateClientConnText(){
+  if (state.connectionReady) $('connStateText').textContent = 'Connected';
+  else $('connStateText').textContent = `No connection (${state.connection.stage})`;
+}
+function closePeer(reason='manual'){
+  cancelClientConnectTimers();
+  try { if (state.dc) state.dc.close(); } catch(e){}
+  try { if (state.pc) state.pc.close(); } catch(e){}
+  state.dc = null;
+  state.pc = null;
+  state.connectionReady = false;
+  state.awaitingState = false;
+  state.answerSent = false;
+  state.lastRemoteOfferSdp = '';
+  resetClientConnectionFlow();
+  updateClientConnText();
+  if (reason) logNet('[peer] closed: ' + reason);
+}
+function scheduleClientHelloTimeout(attemptId){
+  state.connection.timers.hello = clearTimer(state.connection.timers.hello);
+  state.connection.timers.hello = setTimeout(() => {
+    if (attemptId !== state.connection.attemptId) return;
+    if (state.connectionReady || state.connection.helloReceived) return;
+    logConn('hello timeout');
+  }, 45000);
+}
+function updateClientAttemptFromOffer(msg){
+  const attemptId = Number(msg.attemptId || 0) || (state.connection.attemptId + 1);
+  state.connection.attemptId = attemptId;
+  state.connection.offerId = String(msg.offerId || '');
+  state.connection.stage = String(msg.stage || 'remote-offer');
+  state.connection.startedAt = Date.now();
+  state.connection.peerState = 'offer-received';
+  state.connection.dcState = 'closed';
+  state.connection.helloSent = false;
+  state.connection.helloReceived = false;
+  state.connection.transportPolicy = String(msg.transportPolicy || 'all');
+}
+function bindClientPeerEvents(){
+  if (!state.pc) return;
+  state.pc.onsignalingstatechange = () => { state.connection.peerState = state.pc.signalingState; logConn('signaling'); };
+  state.pc.onicegatheringstatechange = () => { logConn('gathering'); updateClientConnText(); };
+  state.pc.oniceconnectionstatechange = () => {
+    logConn('ice');
+    updateClientConnText();
+    if (['connected','completed'].includes(state.pc.iceConnectionState)) logPeerStats('client-ice');
+  };
+  state.pc.onconnectionstatechange = () => {
+    logConn('pc');
+    updateClientConnText();
+    if (state.pc.connectionState === 'connected') logPeerStats('client-pc');
+  };
+  state.pc.ondatachannel = (ev) => {
+    state.dc = ev.channel;
+    state.connection.dcState = state.dc.readyState || 'connecting';
+    logConn('dc created', state.dc.label || '');
+    state.dc.onopen = () => {
+      state.connectionReady = true;
+      state.connection.dcState = 'open';
+      state.connection.helloSent = true;
+      state.connection.peerState = 'connected';
+      updateClientConnText();
+      logConn('dc open');
+      sendMessage({type:'hello', attemptId: state.connection.attemptId, offerId: state.connection.offerId});
+      scheduleClientHelloTimeout(state.connection.attemptId);
+      logPeerStats('client-open');
+    };
+    state.dc.onclose = () => {
+      state.connectionReady = false;
+      state.awaitingState = false;
+      state.connection.dcState = 'closed';
+      updateClientConnText();
+      logConn('dc close');
+    };
+    state.dc.onmessage = (msgEv) => onMessage(JSON.parse(msgEv.data));
+  };
+}
+function buildPeer(transportPolicy='all'){
+  closePeer('rebuild');
+  state.connection.stage = state.connection.stage === 'idle' ? 'offer-processing' : state.connection.stage;
+  state.connection.peerState = 'building';
+  state.connection.transportPolicy = transportPolicy;
+  state.pc = new RTCPeerConnection({
+    iceTransportPolicy: transportPolicy,
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      {
+        urls: [
+          'turn:global.relay.metered.ca:80',
+          'turn:global.relay.metered.ca:80?transport=tcp',
+          'turn:global.relay.metered.ca:443',
+          'turns:global.relay.metered.ca:443?transport=tcp'
+        ],
+        username: '680eb6076718e5a0bfa7fbc1',
+        credential: '/oAmKdtqPst8Vc2r'
+      }
+    ]
+  });
+  bindClientPeerEvents();
+  updateClientConnText();
+  logConn('peer built');
+}
+function sendMessage(obj){
+  if (!state.dc || state.dc.readyState !== 'open'){ logNet('[send] канал не открыт'); return false; }
+  state.dc.send(JSON.stringify(obj));
+  logNet('[send] ' + obj.type + ' | ' + clientConnSnapshot());
+  return true;
+}
+
+function syncSignalStatus(){
+  const btn = $('signalClientBtn');
+  if (!btn) return;
+  btn.textContent = state.signaling.connected ? 'Сервер: client ✓' : 'Сервер: client';
+  btn.disabled = !!state.signalConnecting;
+}
+function closeSignalSocket(){
+  try { if (state.signaling.ws) state.signaling.ws.close(); } catch(e){}
+  state.signaling.ws = null;
+  state.signaling.connected = false;
+  state.signalConnecting = false;
+  state.connection.wsState = 'closed';
+  syncSignalStatus();
+}
+function hasLocalCandidates(pc){
+  const sdp = (pc && pc.localDescription && pc.localDescription.sdp) || '';
+  return sdp.includes('a=candidate:');
+}
+function waitIceReady(pc, timeoutMs=1200){
+  return new Promise(resolve => {
+    if (!pc) return resolve('no-pc');
+    if (pc.iceGatheringState === 'complete') return resolve('complete');
+    if (hasLocalCandidates(pc)) return resolve('candidate');
+    let settled = false;
+    let timer = null;
+    const finish = (reason) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearTimeout(timer);
+      pc.removeEventListener('icegatheringstatechange', check);
+      resolve(reason);
+    };
+    const check = () => {
+      if (pc.iceGatheringState === 'complete') return finish('complete');
+      if (hasLocalCandidates(pc)) return finish('candidate');
+    };
+    timer = setTimeout(() => finish(hasLocalCandidates(pc) ? 'candidate-timeout' : 'timeout'), timeoutMs);
+    pc.addEventListener('icegatheringstatechange', check);
+  });
+}
+async function startSignalClient(){
+  if (state.signalConnecting){
+    logNet('[signal] client request ignored: connecting');
+    return;
+  }
+  if (state.connectionReady){
+    logNet('[signal] client request ignored: already connected');
+    return;
+  }
+  const url = $('signalUrl').value.trim();
+  const room = $('signalRoom').value.trim();
+  if (!url || !room){
+    setStatus('Заполните адрес сервера и комнату.', '');
+    return;
+  }
+  closeSignalSocket();
+  closePeer('restart client signal');
+  state.signalConnecting = true;
+  state.signaling.url = url;
+  state.signaling.room = room;
+  state.connection.wsState = 'connecting';
+  syncSignalStatus();
+  logConn('ws connecting', `url=${url} room=${room}`);
+  const ws = new WebSocket(url);
+  state.signaling.ws = ws;
+  ws.onopen = () => {
+    state.signalConnecting = false;
+    state.signaling.connected = true;
+    state.connection.wsState = 'open';
+    syncSignalStatus();
+    logConn('ws open', 'role=client');
+    ws.send(JSON.stringify({type:'join', role:'client', room}));
+    logNet('[signal] join sent');
+  };
+  ws.onmessage = async (ev) => {
+    try{
+      const msg = JSON.parse(ev.data);
+      if (msg.type === 'offer' && msg.sdp){
+        const sdpKey = JSON.stringify(msg.sdp);
+        if (state.connectionReady){
+          logNet('[signal] offer ignored: already connected');
+          return;
+        }
+        if (state.answerSent && state.lastRemoteOfferSdp === sdpKey){
+          logNet('[signal] duplicate offer ignored');
+          return;
+        }
+        updateClientAttemptFromOffer(msg);
+        buildPeer(msg.transportPolicy || 'all');
+        await state.pc.setRemoteDescription(msg.sdp);
+        state.connection.peerState = 'remote-description-set';
+        logConn('offer applied', `offerId=${state.connection.offerId}`);
+        const answer = await state.pc.createAnswer();
+        await state.pc.setLocalDescription(answer);
+        const waitReason = await waitIceReady(state.pc, state.connection.transportPolicy === 'relay' ? 3500 : 1200);
+        logConn('answer ready', `reason=${waitReason} offerId=${state.connection.offerId}`);
+        $('answerOut').value = JSON.stringify(state.pc.localDescription);
+        ws.send(JSON.stringify({type:'answer', room, sdp: state.pc.localDescription, offerId: state.connection.offerId, attemptId: state.connection.attemptId}));
+        state.answerSent = true;
+        state.lastRemoteOfferSdp = sdpKey;
+        state.connection.peerState = 'answer-sent';
+        scheduleClientHelloTimeout(state.connection.attemptId);
+        logConn('answer sent', `offerId=${state.connection.offerId}`);
+      } else if (msg.type === 'error'){
+        state.connection.lastError = msg.message || 'server error';
+        logNet('[signal error] ' + state.connection.lastError);
+      }
+    }catch(e){
+      logNet('[signal parse error] ' + e.message);
+    }
+  };
+  ws.onclose = () => {
+    state.awaitingState = false;
+    state.signaling.connected = false;
+    state.signalConnecting = false;
+    state.connection.wsState = 'closed';
+    syncSignalStatus();
+    logConn('ws close');
+  };
+  ws.onerror = () => {
+    state.connection.wsState = 'error';
+    logConn('ws error');
+  };
+}
+
+function onMessage(msg){
+  logNet('[recv] ' + msg.type + ' | ' + clientConnSnapshot());
+  if (msg.type === 'hello'){
+    state.connectionReady = true;
+    state.connection.helloReceived = true;
+    state.connection.helloAt = Date.now();
+    state.connection.stage = 'connected';
+    state.connection.peerState = 'connected';
+    cancelClientConnectTimers();
+    updateClientConnText();
+    syncSignalStatus();
+    logConn('hello received');
+    return;
+  }
+  if (msg.type === 'ping'){ sendMessage({type:'pong', attemptId: state.connection.attemptId}); return; }
+  if (msg.type === 'state_sync'){ state.awaitingState = false; applyRemoteState(msg.payload); sendMessage({type:'ack_state', attemptId: state.connection.attemptId}); return; }
+}
+function clientPlay(index){
+  if (!state.gameStarted || state.turn !== 'player' || state.pendingSuitChoice || state.awaitingState) return;
+  render();
+  if (!sendMessage({type:'client_play', index})){
+    render();
+    return;
+  }
+  state.awaitingState = true;
+}
+function clientDraw(){
+  if (!state.gameStarted || state.turn !== 'player' || state.pendingSuitChoice || state.awaitingState) return;
+  render();
+  if (!sendMessage({type:'client_draw'})){
+    render();
+    return;
+  }
+  state.awaitingState = true;
+}
+$('applyOfferBtn').addEventListener('click', async () => {
+  try{
+    state.connection.attemptId += 1;
+    state.connection.offerId = `manual-${state.connection.attemptId}`;
+    state.connection.stage = 'manual';
+    state.connection.startedAt = Date.now();
+    buildPeer('all');
+    const offer = JSON.parse($('offerIn').value);
+    await state.pc.setRemoteDescription(offer);
+    const answer = await state.pc.createAnswer();
+    await state.pc.setLocalDescription(answer);
+    const waitReason = await waitIceReady(state.pc, 1200);
+    $('answerOut').value = JSON.stringify(state.pc.localDescription);
+    state.answerSent = true;
+    state.lastRemoteOfferSdp = JSON.stringify(offer);
+    state.connection.peerState = 'answer-sent';
+    logConn('manual answer created', `reason=${waitReason}`);
+  }catch(e){ logNet('[error] ' + e.message); }
+});
+$('drawBtn').addEventListener('click', clientDraw);
+$('deckStack').addEventListener('dblclick', clientDraw);
+$('pasteOfferBtn').addEventListener('click', () => pasteFromClipboard('offerIn'));
+$('pongBtn').addEventListener('click', () => sendMessage({type:'pong'}));
+$('copyAnswerBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('answerOut').value || ''); logNet('[copy] answer'); } catch(e){ logNet('[error copy answer] ' + e.message); } });
+$('copyLogBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('netLog').textContent || ''); logNet('[copy] log'); } catch(e){ logNet('[error copy log] ' + e.message); } });
+$('clearLogBtn').addEventListener('click', () => { $('netLog').textContent = ''; });
+$('logToggleBtn').addEventListener('click', () => { state.logEnabled = !state.logEnabled; $('logToggleBtn').textContent = state.logEnabled ? 'ЛОГ ON' : 'ЛОГ OFF'; });
+$('debugToggleBtn').addEventListener('click', () => { state.debugEnabled = !state.debugEnabled; $('debugToggleBtn').textContent = state.debugEnabled ? 'DEBUG ON' : 'DEBUG OFF'; });
+$('historyBtn').addEventListener('click', showHistoryPanel);
+$('rulesBtn').addEventListener('click', showRulesPanel);
+$('bgCycleBtn').addEventListener('click', cycleBackgrounds);
+$('signalPreset').addEventListener('change', applySignalPreset);
+$('signalClientBtn').addEventListener('click', startSignalClient);
+$('pickerInline').querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+  if (!state.pendingSuitChoice || state.pendingSuitChoiceRole !== 'enemy' || state.awaitingState) return;
+  logNet('[send] client_choose_suit ' + btn.dataset.suit);
+  render();
+  if (!sendMessage({type:'client_choose_suit', suit: btn.dataset.suit})){
+    render();
+    return;
+  }
+  state.awaitingState = true;
+  state.pendingSuitChoice = false;
+  state.pendingSuitChoiceRole = null;
+  $('pickerInline').classList.remove('show');
+}));
+
+const __closeBtn = $('closeRoundEndBtn');
+const __closeRulesBtn = $('closeRulesBtn'); if (__closeRulesBtn) __closeRulesBtn.addEventListener('click', hideRulesPanel);
+const __rulesBackdrop = $('rulesBackdrop'); if (__rulesBackdrop) __rulesBackdrop.addEventListener('click', hideRulesPanel); if (__closeBtn) __closeBtn.addEventListener('click', hideRoundEnd);
+const __closeHistoryBtn = $('closeHistoryBtn'); if (__closeHistoryBtn) __closeHistoryBtn.addEventListener('click', hideHistoryPanel);
+const __historyBackdrop = $('historyBackdrop'); if (__historyBackdrop) __historyBackdrop.addEventListener('click', hideHistoryPanel);
+$('signalRoom').value = VERSION_NUM;
+applySignalPreset();
+syncSignalStatus();
+loadDefaultButtonBackground();
+loadDefaultTableBackgrounds();
+updateBgButton();
+render(); updateClientConnText();
+</script>
+</body>
+</html>
+
+
