@@ -1,1 +1,1 @@
-# CZ-Durak_iphone
+# CZ-Durak_client-iphone
