@@ -1,0 +1,183 @@
+@media (max-width: 900px){
+
+  :root{
+    --card-w: 56px;
+    --card-h: 80px;
+  }
+
+  body{
+    background-attachment: scroll, scroll;
+  }
+
+  .wrap{
+    padding: 10px 10px 18px;
+  }
+
+  h1{
+    font-size: 22px;
+    margin: 6px 0 10px;
+  }
+
+  .topbar{
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .btn-main,.btn-open,.btn-log,.btn-draw,select,textarea,input,button{
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  .scoreboard{
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .score-card{
+    min-height: auto;
+    padding: 10px 12px;
+  }
+
+  .score-head h3{
+    font-size: 24px;
+  }
+
+  .count-badge{
+    font-size: 18px;
+    min-width: 72px;
+    padding: 6px 10px;
+  }
+
+  .score-grid{
+    font-size: 18px;
+    gap: 4px 10px;
+  }
+
+  .layout{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "enemy"
+      "deck"
+      "pile"
+      "status"
+      "picker"
+      "player";
+    gap: 12px;
+  }
+
+  .enemy-box,
+  .player-box,
+  .status,
+  .picker-inline{
+    width: 100%;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .enemy-box{
+    min-height: 120px;
+  }
+
+  .player-box{
+    min-height: 140px;
+  }
+
+  .name-row{
+    font-size: 17px;
+    margin-bottom: 6px;
+  }
+
+  .cards-row{
+    min-height: 92px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start;
+    padding-bottom: 6px;
+  }
+
+  .cards-row.enemy .card-slot{
+    margin-left: -12px;
+  }
+
+  .cards-row.player .card-slot{
+    margin-left: -8px;
+  }
+
+  .cards-row .card-slot:first-child{
+    margin-left: 0;
+  }
+
+  .center-deck,
+  .pile-box{
+    justify-self: center;
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .deck-stack,
+  .pile-stack{
+    transform: scale(0.82);
+    transform-origin: center top;
+  }
+
+  .deck-stack{
+    width: 100%;
+    max-width: 340px;
+    height: 140px;
+  }
+
+  .pile-stack{
+    width: 100%;
+    max-width: 280px;
+    height: 140px;
+  }
+
+  .stack-count{
+    font-size: 16px;
+    margin-top: 4px;
+  }
+
+  .status{
+    font-size: 16px;
+  }
+
+  .status .sub{
+    font-size: 15px;
+  }
+
+  .picker-inline .picker-title{
+    font-size: 18px;
+    margin-right: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .picker-inline button{
+    font-size: 18px !important;
+    flex: 1 1 45%;
+  }
+
+  .btn-draw{
+    min-width: 0;
+    width: 100%;
+  }
+
+  .server-row{
+    grid-template-columns: 1fr;
+  }
+
+  .netgrid{
+    grid-template-columns: 1fr;
+  }
+
+  .netlog{
+    max-height: 140px;
+    font-size: 12px;
+  }
+
+  .table-watermark{
+    display: none;
+  }
+}
