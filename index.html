@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CZ Durak client_146</title>
+<title>CZ Durak client_147</title>
 <style>
   :root{
     --table:#5c341d; --table-dark:#26150c; --panel:rgba(72,42,24,.42); --text:#f6f6f6;
@@ -126,7 +126,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>CZ Durak client_146</h1>
+  <h1>CZ Durak client_147</h1>
 
   <div class="topbar">
     <button class="btn-log" id="logToggleBtn" type="button" style="display:none">ЛОГ OFF</button>
@@ -205,7 +205,7 @@
           <option value="custom">Custom</option>
         </select>
         <input id="signalUrl" type="text" value="wss://bubbly-tranquility-production.up.railway.app" placeholder="wss://...">
-        <input id="signalRoom" type="text" value="42" placeholder="Комната">
+        <input id="signalRoom" type="text" value="147" placeholder="Комната">
         <button class="btn-log" id="signalClientBtn" type="button">Сервер: client</button>
       </div>
 
@@ -261,7 +261,7 @@
 </div>
 
 <script>
-const APP_VERSION = 'CZ Durak client_146';
+const APP_VERSION = 'CZ Durak client_147';
 const suits = [
   { key: 'clubs', symbol: '♣', color: 'black', label: 'Трефы' },
   { key: 'diamonds', symbol: '♦', color: 'red', label: 'Бубны' },
@@ -297,7 +297,7 @@ const $ = (id) => document.getElementById(id);
 const NL = String.fromCharCode(10);
 const SERVER_PRESETS = { railway: 'wss://bubbly-tranquility-production.up.railway.app', localhost: 'ws://localhost:8787' };
 const ACTION_DELAY_MS = 900;
-const VERSION_NUM = ((APP_VERSION.match(/(\d+)/g) || []).pop()) || '0';
+const VERSION_NUM = (APP_VERSION.match(/_(\d+(?:\.\d+)*)$/)?.[1] || (APP_VERSION.match(/(\d+)/g) || []).pop() || '0');
 
 const BG_FILE_RE = /\.(jpe?g|png|webp)$/i;
 const DEFAULT_BUTTON_BG_CANDIDATES = (() => {
@@ -829,6 +829,7 @@ function bindClientPeerEvents(){
       state.connection.peerState = 'connected';
       updateClientConnText();
       logConn('dc open');
+      logNet('[HELLO] HELLO=SENT=HELLO');
       sendMessage({type:'hello', attemptId: state.connection.attemptId, offerId: state.connection.offerId});
       scheduleClientHelloTimeout(state.connection.attemptId);
       logPeerStats('client-open');
@@ -1011,6 +1012,7 @@ function onMessage(msg){
     cancelClientConnectTimers();
     updateClientConnText();
     syncSignalStatus();
+    logNet('[HELLO] HELLO=RECEIVED=HELLO');
     logConn('hello received');
     return;
   }
