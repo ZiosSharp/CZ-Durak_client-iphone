@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CZ Durak client_147</title>
+<title>CZ Durak host_150</title>
 <style>
   :root{
     --table:#5c341d; --table-dark:#26150c; --panel:rgba(72,42,24,.42); --text:#f6f6f6;
@@ -13,19 +13,23 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background-image:linear-gradient(rgba(18,10,7,.12), rgba(18,10,7,.12)), var(--page-bg-image);background-size:cover,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;background-attachment:fixed,fixed;min-height:100vh}
-  .wrap{max-width:1280px;margin:0 auto;padding:18px 18px 30px}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 18px 30px;position:relative}
   h1{margin:8px 0 12px;text-align:center;font-size:30px}
-  .topbar{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-  .btn-main,.btn-open,.btn-log,.btn-draw,select,textarea,input,button{border:none;border-radius:10px;padding:12px 16px;font-size:18px;box-shadow:var(--shadow)}
+  .settings{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:end;background:linear-gradient(180deg, rgba(255,246,228,.06), rgba(54,31,18,.08)), rgba(54,31,18,.42);padding:16px 18px;border-radius:16px;margin-bottom:14px;border:1px solid rgba(255,228,188,.08);backdrop-filter:blur(1.2px)}
+  .setting{display:flex;flex-direction:column;gap:6px}
+  .setting label{font-size:15px;color:#ecf6ec}
   select,button,textarea,input{border:none;border-radius:10px;padding:12px 16px;font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
   textarea,input{cursor:text}
-  button{cursor:pointer}
-  .btn-main{background:#efefef;color:#111}
-  .btn-open{background:#f3e08d;color:#111}
-  .btn-log{background:#d4eef9;color:#111}
+  .topbar{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .btn-main{background:transparent;color:#efe7d6}
+  .btn-next{background:transparent;color:#174f2d}
+  .btn-newgame{background:transparent;color:#fff3ec}
+  .btn-open{background:transparent;color:#8b6500}
+  .btn-log{background:transparent;color:#e4f0ff}
   .btn-draw{background:#d7cf5a;color:#111; min-width:260px}
   .btn-draw[disabled], button[disabled]{opacity:.45; cursor:not-allowed}
-  .btn-bg{background:#ead7b3;color:#2d1a10;padding:9px 12px;font-size:16px;min-width:108px}
+  .btn-draw:not([disabled]){filter:brightness(1.02);text-shadow:none}
+  .btn-bg{background:transparent;color:#3e2a1a;padding:9px 12px;font-size:16px;min-width:82px}
 
   .btn-main,.btn-open,.btn-log,.btn-draw,.btn-bg,.picker-inline button,.round-end button,.history-box button{
     background-color:#d7be9a;
@@ -65,7 +69,7 @@
   .pile-box{grid-area:pile;justify-self:start;min-width:330px;min-height:170px;display:flex;align-items:center;justify-content:flex-start}
   .status{grid-area:status;justify-self:center;width:min(1020px, 100%);background:linear-gradient(180deg, rgba(244,229,199,.94), rgba(220,200,160,.94));color:#111;padding:14px 20px;border-radius:12px;font-size:20px;box-shadow:var(--shadow)}
   .status .sub{display:block;margin-top:8px;font-size:18px;color:#4a3f18;font-weight:700;white-space:pre-line}
-  .picker-inline{grid-area:picker;justify-self:center;display:none;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;width:min(960px, 100%);background:rgba(255,255,255,.08);border-radius:14px;padding:12px;position:relative;z-index:20}
+  .picker-inline{grid-area:picker;justify-self:center;display:none;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;width:min(960px, 100%);background:rgba(255,255,255,.08);border-radius:14px;padding:12px}
   .picker-inline.show{display:flex;position:relative;z-index:5}
   .picker-inline .picker-title{font-size:20px;margin-right:10px}
   .picker-inline button{background:#d7cf5a;color:#111}
@@ -77,6 +81,8 @@
   .card{width:var(--card-w);height:var(--card-h);border-radius:7px;background:#fff;color:#111;border:1px solid rgba(0,0,0,.28);position:relative;box-shadow:0 6px 12px rgba(0,0,0,.28);overflow:hidden;user-select:none}
   .card.faceup.playable{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
   .card.faceup.playable:hover{transform:translateY(-10px);box-shadow:0 12px 18px rgba(0,0,0,.34)}
+  .card.dragging{outline:3px solid #f3e08d; transform:translateY(-8px)}
+  .card.swap-highlight{outline:4px solid #ffe36a; box-shadow:0 0 0 3px rgba(255,227,106,.25), 0 0 24px rgba(255,227,106,.95), 0 6px 12px rgba(0,0,0,.28)}
   .card.back{background:
       linear-gradient(135deg, rgba(255,255,255,.18) 25%, transparent 25%) -8px 0/16px 16px,
       linear-gradient(225deg, rgba(255,255,255,.18) 25%, transparent 25%) -8px 0/16px 16px,
@@ -113,7 +119,6 @@
   .history-box .actions{text-align:right;margin-top:12px}
   .history-box button{background:#f3e08d;color:#111;border:none;border-radius:10px;padding:10px 14px;font-size:18px;cursor:pointer}
 
-
   .layout{position:relative}
   .layout > *{position:relative;z-index:1}
 .table-watermark{position:absolute;left:0;right:0;top:102px;bottom:300px;display:flex;align-items:center;justify-content:center;transform:translateX(26px);pointer-events:none;user-select:none;z-index:0;color:rgba(244,223,198,.56);text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;filter:drop-shadow(0 2px 1px rgba(255,240,220,.18))}
@@ -122,16 +127,61 @@
   .table-watermark .wm-line{width:110px;height:3px;background:linear-gradient(90deg, rgba(244,223,198,.0), rgba(244,223,198,.72), rgba(244,223,198,.0));box-shadow:0 1px 0 rgba(255,246,230,.18),0 3px 8px rgba(26,12,7,.25);border-radius:999px}
   .table-watermark .wm-bridge{font-size:clamp(68px,8.7vw,116px);font-weight:900;letter-spacing:.018em;line-height:.92;color:rgba(248,231,208,.70);text-shadow:0 1px 0 rgba(255,248,235,.56),0 -1px 0 rgba(78,47,28,.74),0 2px 0 rgba(118,82,58,.28),0 9px 20px rgba(44,22,11,.44)}
 
+
+
+  .credit-signature{position:absolute;right:20px;top:14px;color:rgba(255,248,235,.94);font-size:18px;font-weight:700;letter-spacing:.02em;text-shadow:0 1px 0 rgba(0,0,0,.55),0 0 8px rgba(0,0,0,.28);z-index:5;pointer-events:none}
+
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>CZ Durak client_147</h1>
+  <div class="credit-signature">by LAMM_-*-_VURDALAK</div>
+  <h1>CZ Durak host_150</h1>
+
+  <div class="settings">
+    <div class="setting">
+      <label for="drawRule">Запрет добора при числе ходов</label>
+      <select id="drawRule">
+        <option value="2">2 карты</option>
+        <option value="1">1 карта</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label for="starterRule">Кто ходит первым в новом сете</label>
+      <select id="starterRule">
+        <option value="fixed_enemy">Заданный: соперник</option>
+        <option value="fixed_player">Заданный: вы</option>
+        <option value="random">Случайно</option>
+        <option value="prev_winner" selected>Победитель прошлого сета</option>
+        <option value="prev_loser">Проигравший прошлого сета</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label for="deckMode">Что делать с пустой колодой</label>
+      <select id="deckMode">
+        <option value="shuffle">Перемешать сброс</option>
+        <option value="flip">Просто перевернуть сброс</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label for="gameVariant">Версия игры</label>
+      <select id="gameVariant">
+        <option value="101" selected>101</option>
+        <option value="bridge">Бридж</option>
+      </select>
+    </div>
+  </div>
 
   <div class="topbar">
-    <button class="btn-log" id="logToggleBtn" type="button" style="display:none">ЛОГ OFF</button>
-    <button class="btn-log" id="historyBtn" type="button">История</button>
-    <button class="btn-log" id="debugToggleBtn" type="button" style="display:none">DEBUG OFF</button>
+    <button class="btn-main btn-next" id="nextSetBtn" type="button">NEXT SET</button>
+    <button class="btn-open" id="toggleDeckBtn" type="button">ПК</button>
+    <button class="btn-open" id="toggleEnemyBtn" type="button">ПКС</button>
+    <button class="btn-open" id="togglePileBtn" type="button">3К</button>
+    <button class="btn-main btn-newgame" id="newGameBtn" type="button">NEW GAME</button>
+    <button class="btn-log" id="logToggleBtn" type="button">LOG OFF</button>
+    <button class="btn-log" id="folderBtn" type="button">Folder</button>
+    <button class="btn-log" id="historyBtn" type="button">History</button>
+    <button class="btn-log" id="debugToggleBtn" type="button">DEBUG OFF</button>
     <button class="btn-log" id="rulesBtn" type="button">Rules</button>
     <button class="btn-bg" id="bgCycleBtn" type="button">BG</button>
     <span id="connStateText">No connection</span>
@@ -139,19 +189,19 @@
 
   <div class="scoreboard">
     <div class="score-card">
-      <div class="score-head"><h3>Соперник</h3><div id="enemyCountTop" class="count-badge">—</div></div>
-      <div class="score-grid">
-        <div class="label">Общий счёт</div><div class="value" id="enemyTotalScore">0</div>
-        <div class="label">Раунд</div><div class="value" id="enemyRoundScore">—</div>
-        <div class="label">Ход</div><div class="value" id="enemyTurnValue">—</div>
-      </div>
-    </div>
-    <div class="score-card">
       <div class="score-head"><h3>Вы</h3><div id="playerCountTop" class="count-badge">—</div></div>
       <div class="score-grid">
         <div class="label">Общий счёт</div><div class="value" id="playerTotalScore">0</div>
         <div class="label">Раунд</div><div class="value" id="playerRoundScore">—</div>
         <div class="label">Ход</div><div class="value" id="playerTurnValue">—</div>
+      </div>
+    </div>
+    <div class="score-card">
+      <div class="score-head"><h3>Соперник</h3><div id="enemyCountTop" class="count-badge">—</div></div>
+      <div class="score-grid">
+        <div class="label">Общий счёт</div><div class="value" id="enemyTotalScore">0</div>
+        <div class="label">Раунд</div><div class="value" id="enemyRoundScore">—</div>
+        <div class="label">Ход</div><div class="value" id="enemyTurnValue">—</div>
       </div>
     </div>
   </div>
@@ -172,7 +222,7 @@
     </div>
 
     <div class="status">
-      <span id="statusMain">Сначала вставьте offer от host и примените его.</span>
+      <span id="statusMain">Присоединитесь к серверу кнопками (внизу) Connection и Server:host (клиент также должен подключится к серверу). Когда Host и Client усешно подключились к серверу нажмите NEW GAME.</span>
       <span class="sub" id="statusSub"></span>
     </div>
 
@@ -189,8 +239,7 @@
       <div class="cards-row player" id="playerRow"></div>
       <div class="small-note"><button class="btn-draw" id="drawBtn">Взять из колоды</button></div>
       <div class="legend">
-        <div>Client отправляет действия host.</div>
-        <div>После ответа host state обновляется автоматически.</div>
+        
       </div>
     </div>
   </div>
@@ -205,15 +254,15 @@
           <option value="custom">Custom</option>
         </select>
         <input id="signalUrl" type="text" value="wss://bubbly-tranquility-production.up.railway.app" placeholder="wss://...">
-        <input id="signalRoom" type="text" value="147" placeholder="Комната">
-        <button class="btn-log" id="signalClientBtn" type="button">Сервер: client</button>
+        <input id="signalRoom" type="text" value="150" placeholder="Комната">
+        <button class="btn-log" id="signalHostBtn" type="button">Server: host</button>
       </div>
 
       <div class="subpanel">
         <div class="row" style="margin-bottom:8px">
           <button class="btn-log" id="copyLogBtn" type="button">Copy log</button>
           <button class="btn-log" id="clearLogBtn" type="button">Clear log</button>
-          <button class="btn-log" id="pongBtn" type="button">PONG</button>
+          <button class="btn-log" id="pingBtn" type="button">PING</button>
         </div>
         <div id="netLog" class="netlog"></div>
       </div>
@@ -223,21 +272,29 @@
         <div class="netgrid">
         <div>
           <div class="row" style="margin-bottom:8px">
-            <button class="btn-log" id="pasteOfferBtn" type="button">Paste</button>
-            <button class="btn-log" id="applyOfferBtn" type="button">Apply offer</button>
+            <button class="btn-log" id="createOfferBtn" type="button">Create offer</button>
+            <button class="btn-log" id="copyOfferBtn" type="button">Copy</button>
           </div>
-          <textarea id="offerIn" placeholder="Вставьте сюда offer от host вручную (Ctrl+V)"></textarea>
+          <textarea id="offerOut" readonly placeholder="Offer для client (копировать кнопкой Copy)"></textarea>
         </div>
         <div>
           <div class="row" style="margin-bottom:8px">
-            <button class="btn-log" id="copyAnswerBtn" type="button">Copy</button>
+            <button class="btn-log" id="pasteAnswerBtn" type="button">Paste</button>
+            <button class="btn-log" id="applyAnswerBtn" type="button">Apply answer</button>
           </div>
-          <textarea id="answerOut" readonly placeholder="Answer для host (копировать кнопкой Copy)"></textarea>
+          <textarea id="answerIn" placeholder="Вставьте сюда answer от client вручную (Ctrl+V)"></textarea>
         </div>
       </div>
       </details>
     </details>
   </div>
+</div>
+
+<div id="historyBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:1000"></div>
+<div class="history-box" id="historyPanel">
+  <h4>История счёта</h4>
+  <div class="lines" id="historyLines"></div>
+  <div class="actions"><button id="closeHistoryBtn" type="button">Закрыть</button></div>
 </div>
 
 <div id="rulesBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:1000"></div>
@@ -253,45 +310,62 @@
   <div class="actions"><button id="closeRoundEndBtn" type="button">Закрыть</button></div>
 </div>
 
-<div id="historyBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:1000"></div>
-<div class="history-box" id="historyPanel">
-  <h4>История счёта</h4>
-  <div class="lines" id="historyLines"></div>
-  <div class="actions"><button id="closeHistoryBtn" type="button">Закрыть</button></div>
-</div>
-
 <script>
-const APP_VERSION = 'CZ Durak client_147';
+const APP_VERSION = 'CZ Durak host_150';
 const suits = [
   { key: 'clubs', symbol: '♣', color: 'black', label: 'Трефы' },
   { key: 'diamonds', symbol: '♦', color: 'red', label: 'Бубны' },
   { key: 'hearts', symbol: '♥', color: 'red', label: 'Червы' },
   { key: 'spades', symbol: '♠', color: 'black', label: 'Пики' }
 ];
+const ranks = ['6','7','8','9','10','J','Q','K','A'];
 const state = {
-  role: 'client',
+  role: 'host',
+  rules: { handSize: 5, drawDisabledAtPlayableCount: 2, starterRule: 'prev_winner', deckMode: 'shuffle', gameVariant: '101' },
   deck: [], playerHand: [], enemyHand: [], pile: [],
   showEnemy: false, showDeck: false, forcedSuit: null, pendingSuitChoice: false,
-  pendingSuitChoiceRole: null, turn: null, gameStarted: false, roundEnded: false,
-  scores: { playerTotal: 0, enemyTotal: 0, playerRound: 0, enemyRound: 0 }, history: [], matchOver: false, roundEndInfo: null,
-  logEnabled: false, debugEnabled: false, dragIndex: null,
-  signaling: { ws: null, url: 'ws://localhost:8787', room: '', connected: false },
-  connectionReady: false, pc: null, dc: null, rules: { gameVariant: '101' },
-  signalConnecting: false,
-  answerSent: false,
-  lastRemoteOfferSdp: '',
-  classicLog: '',
-  lastRejectInfo: '',
+  pendingSuitChoiceRole: null,
+  turn: null, gameStarted: false, roundEnded: false,
+  scores: { playerTotal: 0, enemyTotal: 0, playerRound: 0, enemyRound: 0 },
+  lastSetWinner: null, history: [], matchOver: false, roundEndInfo: null, roundEndInfoClient: null,
+  logEnabled: false, debugEnabled: false,
+  dragIndex: null,
+  deckDragIndex: null,
+  handHighlightIndex: null,
+  handHighlightTimer: null,
+  currentRunActor: null,
+  currentRunCards: [],
   bgFiles: [],
   bgIndex: -1,
   bgName: '',
   pendingBgName: '',
-  awaitingState: false,
+  bgLoadStarted: false,
+  actionRunning: false,
+  actionQueue: Promise.resolve(),
+  signaling: { ws: null, url: 'ws://localhost:8787', room: '', connected: false },
+  connectionReady: false, pc: null, dc: null,
+  signalConnecting: false,
+  offerSent: false,
+  answerApplied: false,
+  lastOfferSdp: '',
+  sessionStartedAt: '',
+  sessionEvents: [],
+  debugEntries: [],
+  setSummaries: [],
+  dirHandle: null,
+  sessionStamp: '',
+  gameLogDate: '',
+  lastAction: '',
+  classicLogCache: '',
+  rejectCount: 0,
+  archivedGames: [],
+  currentGameSets: [],
   connection: {
     attemptId: 0, stage: 'idle', wsState: 'closed', peerState: 'idle', dcState: 'closed',
     offerId: '', helloSent: false, helloReceived: false, startedAt: 0, helloAt: 0,
-    lastError: '', timers: { hello: null, retry: null }, transportPolicy: 'all'
-  },
+    lastError: '', lastStageResult: '', transportPolicy: 'all',
+    timers: { hello: null, retry: null }
+  }
 };
 const $ = (id) => document.getElementById(id);
 const NL = String.fromCharCode(10);
@@ -320,12 +394,8 @@ const DEFAULT_TABLE_BG_MANIFESTS = ['Pics/backgrounds.json','Pics/list.json','Pi
 const DEFAULT_TABLE_BG_CANDIDATES = (() => {
   const items = [];
   const exts = ['jpg','jpeg','png','webp'];
-  const prefixes = ['','bg','table','leather','skin','pic'];
-  for (const prefix of prefixes){
-    for (let i = 1; i <= 200; i++){
-      const stem = `${prefix}${i}`;
-      for (const ext of exts) items.push(`Pics/${stem}.${ext}`);
-    }
+  for (let i = 1; i <= 200; i++){
+    for (const ext of exts) items.push(`Pics/bg${i}.${ext}`);
   }
   return items;
 })();
@@ -366,6 +436,8 @@ async function tryLoadManifest(url){
   return null;
 }
 async function loadDefaultTableBackgrounds(){
+  if (state.bgLoadStarted) return;
+  state.bgLoadStarted = true;
   let urls = null;
   for (const manifest of DEFAULT_TABLE_BG_MANIFESTS){
     urls = await tryLoadManifest(manifest);
@@ -429,26 +501,238 @@ const RULES_TEXT = `В Чешского дурака играют два игр�
 Игрок, первым набравший больше 101 очков, считается проигравшим.
 Важный бонус: У игрока, набравшего 101 очко ровно, все очки обнуляются (в ноль) и игра продолжается.`;
 
+const LIMIT_RESET = 101;
+function getCardPoints(card){
+  if (card.rank === 'J') return 2;
+  if (card.rank === 'Q') return 3;
+  if (card.rank === 'K') return 4;
+  if (card.rank === 'A') return 11;
+  return Number(card.rank);
+}
+function computeHandPenalty(hand){
+  if (hand.length === 1 && hand[0].rank === 'Q') return hand[0].suit === 'spades' ? 40 : 20;
+  return hand.reduce((sum, card) => sum + getCardPoints(card), 0);
+}
+function finishBonusForWinningCard(card){
+  if (!card || card.rank !== 'Q') return 0;
+  return card.suit === 'spades' ? -40 : -20;
+}
+function reset101(total){ return total === LIMIT_RESET ? 0 : total; }
 function showRoundEnd(title, lines){
   $('roundEndTitle').textContent = title;
   $('roundEndLines').textContent = lines;
   $('roundEndPanel').classList.add('show');
 }
 function hideRoundEnd(){ $('roundEndPanel').classList.remove('show'); }
-
-function netTime(){
+function historyText(){ return buildScoreHistory(); }
+function localStamp(){
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+}
+function localDisplayStamp(){
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function archiveCurrentGameIfNeeded(){
+  if (state.currentGameSets.length){
+    state.archivedGames.push([...state.currentGameSets]);
+    state.currentGameSets = [];
+  }
+}
+function buildScoreHistory(){
+  const games = [...state.archivedGames];
+  if (state.currentGameSets.length) games.push(state.currentGameSets);
+  const parts = [];
+  parts.push(APP_VERSION);
+  parts.push(`Старт сессии: ${state.sessionStartedAt}`);
+  parts.push('');
+  if (!games.length){
+    parts.push('Пока нет завершённых сетов и игр.');
+  } else {
+    games.forEach((sets, gameIdx) => {
+      parts.push(`Игра ${gameIdx + 1}`);
+      parts.push(`     Host | Client`);
+      parts.push(`     -------------`);
+      sets.forEach((item, idx) => {
+        const left = String(item.host).padStart(5, ' ');
+        const right = String(item.client).padStart(6, ' ');
+        parts.push(`${String(idx + 1).padStart(2, ' ')}. ${left} | ${right}`);
+      });
+      parts.push('');
+    });
+  }
+  parts.push(`Текущий общий счёт — Вы: ${state.scores.playerTotal}, соперник: ${state.scores.enemyTotal}.`);
+  if (state.matchOver){
+    parts.push(`Матч завершён. Проиграл: ${state.scores.playerTotal > LIMIT_RESET ? 'Вы' : 'соперник'}.`);
+  }
+  return parts.join(NL);
+}
+function fileStamp(){ return state.sessionStamp || localStamp(); }
+function showHistoryPanel(){
+  $('historyLines').textContent = buildScoreHistory();
+  if ($('historyBackdrop')) $('historyBackdrop').style.display = "block";
+  $('historyPanel').classList.add('show');
+}
+function hideHistoryPanel(){
+  $('historyPanel').classList.remove('show');
+  if ($('historyBackdrop')) $('historyBackdrop').style.display = "none";
+}
+function timeStampLocal(){
   const d = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
+function eventLog(kind, msg){
+  state.sessionEvents.push(`${timeStampLocal()}  [${kind}] ${msg}`);
+}
+function debugEvent(kind, msg, extra=''){
+  if (!state.debugEnabled) return;
+  const suffix = extra ? ` | ${extra}` : '';
+  state.debugEntries.push(`${timeStampLocal()}  [${kind}] ${msg}${suffix}`);
+}
+function cardsText(cards){
+  return cards.length ? cards.map(cardText).join(', ') : '—';
+}
+function playableText(hand){
+  return cardsText(getPlayableCards(hand));
+}
+function refreshClassicLogCache(){
+  state.classicLogCache = buildClassicLog();
+  return state.classicLogCache;
+}
+function buildClassicLog(){
+  const parts = [];
+  parts.push(`Старт сессии: ${state.sessionStartedAt}`);
+  parts.push('');
+  parts.push('Сеты:');
+  parts.push(state.setSummaries.length ? state.setSummaries.join(NL) : '—');
+  parts.push('');
+  parts.push('События:');
+  parts.push(state.sessionEvents.length ? state.sessionEvents.join(NL) : '—');
+  return parts.join(NL);
+}
+function buildDebugLog(){
+  const parts = [];
+  parts.push(`Старт сессии: ${state.sessionStartedAt}`);
+  parts.push('');
+  parts.push('DEBUG:');
+  parts.push(state.debugEntries.length ? state.debugEntries.join(NL) : 'debug выключен');
+  parts.push('');
+  parts.push('CONNECTION:');
+  parts.push(hostConnSnapshot());
+  parts.push('');
+  parts.push('NETWORK:');
+  parts.push($('netLog').textContent || 'network log пуст');
+  return parts.join(NL);
+}
+async function saveLogToDisk(kind='both'){
+  if (!state.dirHandle) return;
+  try{
+    refreshClassicLogCache();
+    const sub = await state.dirHandle.getDirectoryHandle('1', {create: true});
+    const stamp = fileStamp();
+    if ((kind === 'game' || kind === 'both') && state.logEnabled){
+      const gameHandle = await sub.getFileHandle(`CZ_Durak_${stamp}_game_${VERSION_NUM}.txt`, {create: true});
+      const gameWritable = await gameHandle.createWritable({keepExistingData:false});
+      await gameWritable.write(buildClassicLog());
+      await gameWritable.close();
+    }
+    if ((kind === 'debug' || kind === 'both') && state.debugEnabled){
+      const debugHandle = await sub.getFileHandle(`CZ_Durak_${stamp}_debug_${VERSION_NUM}.txt`, {create: true});
+      const debugWritable = await debugHandle.createWritable({keepExistingData:false});
+      await debugWritable.write(buildDebugLog());
+      await debugWritable.close();
+    }
+  }catch(e){
+    logNet('[log write skipped] ' + e.message);
+  }
+}
+async function chooseLogFolder(){
+  if (!window.showDirectoryPicker){
+    setStatus('Браузер не поддерживает прямую запись в папку.', 'Используйте современный браузер для выбора папки логов.');
+    return;
+  }
+  try{
+    state.dirHandle = await window.showDirectoryPicker();
+    eventLog('system', 'Подключена папка логов.');
+    debugEvent('system', 'Подключена папка логов.');
+    setStatus('Папка логов подключена.', 'Файлы будут создаваться отдельно: LOG ON -> game, DEBUG ON -> debug.');
+  }catch(e){
+    setStatus('Подключение папки логов отменено.', '');
+  }
+}
+async function toggleGameLog(){
+  state.logEnabled = !state.logEnabled;
+  $('logToggleBtn').textContent = state.logEnabled ? 'LOG ON' : 'LOG OFF';
+  eventLog('system', `Лог ${state.logEnabled ? 'включён' : 'выключен'}.`);
+  if (state.logEnabled) await saveLogToDisk('game');
+}
+async function toggleDebugLog(){
+  state.debugEnabled = !state.debugEnabled;
+  $('debugToggleBtn').textContent = state.debugEnabled ? 'DEBUG ON' : 'DEBUG OFF';
+  debugEvent('system', `Debug ${state.debugEnabled ? 'включён' : 'выключен'}.`);
+  if (state.debugEnabled) await saveLogToDisk('debug');
+}
+async function pasteFromClipboard(targetId){
+  try{
+    const text = await navigator.clipboard.readText();
+    if (!text) throw new Error('clipboard empty');
+    $(targetId).value = text;
+    logNet('[paste] ' + targetId);
+  }catch(e){
+    $(targetId).focus();
+    $(targetId).select();
+    logNet('[paste unavailable] Вставьте текст вручную в ' + targetId);
+  }
+}
+function downloadTextFile(filename, text){
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 250);
+}
+function rejectClientAction(reason, extra=''){
+  state.rejectCount += 1;
+  state.lastAction = `отклонено действие client: ${reason}`;
+  eventLog('reject', `Действие соперника отклонено: ${reason}.`);
+  debugEvent('reject', `Client action rejected: ${reason}.`, extra);
+  setStatus('Действие client отклонено.', reason);
+  autoSync();
+}
+
+
+function applySignalPreset(){
+  const preset = $('signalPreset');
+  const url = $('signalUrl');
+  if (!preset || !url) return;
+  if (preset.value === 'railway') url.value = SERVER_PRESETS.railway;
+  else if (preset.value === 'localhost') url.value = SERVER_PRESETS.localhost;
+}
+function showRulesPanel(){
+  $('rulesLines').textContent = RULES_TEXT;
+  if ($('rulesBackdrop')) $('rulesBackdrop').style.display = 'block';
+  $('rulesPanel').classList.add('show');
+}
+function hideRulesPanel(){
+  $('rulesPanel').classList.remove('show');
+  if ($('rulesBackdrop')) $('rulesBackdrop').style.display = 'none';
+}
 function logNet(msg){
-  $('netLog').textContent += `${netTime()}  ${msg}\n`;
+  const stamp = timeStampLocal();
+  $('netLog').textContent += `${stamp}  ${msg}\n`;
   $('netLog').scrollTop = $('netLog').scrollHeight;
 }
 function setConnText(){ $('connStateText').textContent = state.connectionReady ? 'Connected' : 'No connection'; }
 function suitInfo(key){ return suits.find(s => s.key === key); }
 function cardText(card){ return `${card.rank}${suitInfo(card.suit).symbol}`; }
 function lastPileCard(){ return state.pile.length ? state.pile[state.pile.length - 1] : null; }
+function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 function setStatus(main, sub=''){
   $('statusMain').textContent = main;
   const parts = [];
@@ -456,6 +740,26 @@ function setStatus(main, sub=''){
   const forcedLine = state.forcedSuit ? `Заказана масть: ${suitInfo(state.forcedSuit).label}.` : '';
   if (forcedLine && !(main || '').includes(forcedLine) && !(sub || '').includes(forcedLine)) parts.push(forcedLine);
   $('statusSub').textContent = parts.join('\n');
+}
+function shuffle(arr){ const copy=[...arr]; for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]]; } return copy; }
+function reverseCopy(arr){ return [...arr].reverse(); }
+function makeDeck(){ const deck=[]; for(const suit of suits){ for(const rank of ranks){ deck.push({suit:suit.key, rank}); } } return shuffle(deck); }
+function readSettings(){
+  state.rules.drawDisabledAtPlayableCount = Number($('drawRule').value);
+  state.rules.starterRule = $('starterRule').value;
+  state.rules.deckMode = $('deckMode').value;
+  state.rules.gameVariant = $('gameVariant').value;
+}
+function determineStarter(){
+  const rule = state.rules.starterRule;
+  if (rule === 'fixed_enemy') return 'enemy';
+  if (rule === 'fixed_player') return 'player';
+  if (rule === 'prev_winner') return state.lastSetWinner || 'player';
+  if (rule === 'prev_loser') {
+    if (!state.lastSetWinner) return 'player';
+    return state.lastSetWinner === 'player' ? 'enemy' : 'player';
+  }
+  return Math.random() < 0.5 ? 'player' : 'enemy';
 }
 function canPlayOnTop(card, topCard, forcedSuit){
   if (!topCard) return true;
@@ -469,7 +773,228 @@ function getPlayableCards(hand){
 }
 function shouldEnableDraw(hand){
   if (state.roundEnded || !state.gameStarted) return false;
-  return getPlayableCards(hand).length < Number(state.rules.drawDisabledAtPlayableCount || 2);
+  return getPlayableCards(hand).length < state.rules.drawDisabledAtPlayableCount;
+}
+
+function flashHandCard(index){
+  state.handHighlightIndex = index;
+  if (state.handHighlightTimer) clearTimeout(state.handHighlightTimer);
+  state.handHighlightTimer = setTimeout(() => {
+    state.handHighlightIndex = null;
+    state.handHighlightTimer = null;
+    render();
+  }, 1800);
+}
+function visiblePileForDisplay(includeSecret=false){
+  if (includeSecret && state.showAllPile) return state.pile.slice(-18);
+  if (state.currentRunCards.length > 3) return state.currentRunCards.slice();
+  return state.pile.slice(-3);
+}
+function updateRunAfterPlay(actor, card){
+  if (state.currentRunActor === actor){
+    state.currentRunCards.push(card);
+  } else {
+    state.currentRunActor = actor;
+    state.currentRunCards = [card];
+  }
+}
+function reorderDeckCards(fromIndex, toIndex){
+  if (!state.showDeck) return;
+  if (fromIndex === toIndex || fromIndex == null || toIndex == null) return;
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= state.deck.length || toIndex >= state.deck.length) return;
+  const item = state.deck.splice(fromIndex, 1)[0];
+  state.deck.splice(toIndex, 0, item);
+  state.deckDragIndex = null;
+  debugEvent('deck_reorder', 'Изменён порядок карт в колоде.', `from=${fromIndex} to=${toIndex} moved=${cardText(item)}`);
+  render();
+}
+function swapHandCardWithDeck(handIndex, deckIndex){
+  if (!state.showDeck) return;
+  if (handIndex == null || deckIndex == null) return;
+  if (handIndex < 0 || deckIndex < 0) return;
+  const handCard = state.playerHand[handIndex];
+  const deckCard = state.deck[deckIndex];
+  if (!handCard || !deckCard) return;
+  state.playerHand[handIndex] = deckCard;
+  state.deck[deckIndex] = handCard;
+  state.dragIndex = null;
+  flashHandCard(handIndex);
+  debugEvent('deck_swap', 'Игрок поменял карту из руки с картой из колоды.', `handIndex=${handIndex} deckIndex=${deckIndex} sent=${cardText(handCard)} got=${cardText(deckCard)}`);
+  render();
+}
+function finishRound(winner, winningCard){
+  if (state.roundEnded) return false;
+  state.roundEnded = true;
+  state.gameStarted = false;
+  state.pendingSuitChoice = false;
+  state.pendingSuitChoiceRole = null;
+  state.forcedSuit = null;
+  state.showEnemy = true;
+
+  const winEffect = specialEffect(winningCard);
+  if (winEffect && winEffect.draw > 0){
+    const targetHand = winner === 'player' ? state.enemyHand : state.playerHand;
+    const targetLabel = winner === 'player' ? 'Соперник' : 'Вы';
+    const drawn = [];
+    for (let i = 0; i < winEffect.draw; i++){
+      if (!ensureDeckAvailable()) break;
+      const extraCard = drawOneTo(targetHand);
+      if (!extraCard) break;
+      drawn.push(cardText(extraCard));
+      eventLog('draw', `${targetLabel} добрал ${cardText(extraCard)} из-за последней карты ${cardText(winningCard)}.`);
+    }
+    if (drawn.length){
+      debugEvent('finish', 'Winning special applied before score.', `winningCard=${cardText(winningCard)} drawn=${drawn.join(', ')}`);
+    }
+  }
+
+  const playerRound = winner === 'player' ? finishBonusForWinningCard(winningCard) : computeHandPenalty(state.playerHand);
+  const enemyRound = winner === 'enemy' ? finishBonusForWinningCard(winningCard) : computeHandPenalty(state.enemyHand);
+
+  const rawPlayerTotal = state.scores.playerTotal + playerRound;
+  const rawEnemyTotal = state.scores.enemyTotal + enemyRound;
+  const playerReset = rawPlayerTotal === LIMIT_RESET;
+  const enemyReset = rawEnemyTotal === LIMIT_RESET;
+  const finalPlayerTotal = reset101(rawPlayerTotal);
+  const finalEnemyTotal = reset101(rawEnemyTotal);
+
+  state.scores.playerRound = playerRound;
+  state.scores.enemyRound = enemyRound;
+  state.scores.playerTotal = finalPlayerTotal;
+  state.scores.enemyTotal = finalEnemyTotal;
+  state.lastSetWinner = winner;
+
+  const matchLoser = rawPlayerTotal > LIMIT_RESET ? 'player' : (rawEnemyTotal > LIMIT_RESET ? 'enemy' : null);
+  state.matchOver = !!matchLoser;
+
+  const lines = [
+    `Победитель сета: ${winner === 'player' ? 'Вы' : 'он'}.`,
+    `Очки за сет — Вы: ${playerRound >= 0 ? '+' : ''}${playerRound}, он: ${enemyRound >= 0 ? '+' : ''}${enemyRound}.`,
+    `Общий счёт — Вы: ${finalPlayerTotal}, он: ${finalEnemyTotal}.`
+  ];
+  if (playerReset) lines.push('У вас сработало правило 101 → 0.');
+  if (enemyReset) lines.push('У соперника сработало правило 101 → 0.');
+  if (matchLoser) lines.push(`Матч завершён. Проиграл: ${matchLoser === 'player' ? 'Вы' : 'он'}.`);
+
+  const clientLines = [
+    `Победитель сета: ${winner === 'enemy' ? 'Вы' : 'он'}.`,
+    `Очки за сет — Вы: ${enemyRound >= 0 ? '+' : ''}${enemyRound}, он: ${playerRound >= 0 ? '+' : ''}${playerRound}.`,
+    `Общий счёт — Вы: ${finalEnemyTotal}, он: ${finalPlayerTotal}.`
+  ];
+  if (enemyReset) clientLines.push('У вас сработало правило 101 → 0.');
+  if (playerReset) clientLines.push('У соперника сработало правило 101 → 0.');
+  if (matchLoser) clientLines.push(`Матч завершён. Проиграл: ${matchLoser === 'enemy' ? 'Вы' : 'он'}.`);
+
+  state.lastAction = `завершён ${matchLoser ? 'матч' : 'сет'}`;
+  state.roundEndInfo = {title: matchLoser ? 'Матч завершён' : 'Сет завершён', lines: lines.join(NL)};
+  state.roundEndInfoClient = {title: matchLoser ? 'Матч завершён' : 'Сет завершён', lines: clientLines.join(NL)};
+  state.currentGameSets.push({host: finalPlayerTotal, client: finalEnemyTotal});
+  state.history.push(lines.join(' | '));
+  state.setSummaries.push(`${timeStampLocal()}  ${lines.join(' | ')}`);
+  eventLog('set_result', lines.join(' | '));
+  debugEvent('finish', 'Round finished.', `winner=${winner} winningCard=${winningCard ? cardText(winningCard) : '-'} rawTotals=${rawPlayerTotal}/${rawEnemyTotal} finalTotals=${finalPlayerTotal}/${finalEnemyTotal}`);
+  refreshClassicLogCache();
+  if (state.dirHandle && (state.logEnabled || state.debugEnabled)) {
+    saveLogToDisk('both');
+  }
+  setStatus(matchLoser ? 'Матч завершён.' : 'Сет завершён.', state.roundEndInfo.lines);
+  showRoundEnd(state.roundEndInfo.title, state.roundEndInfo.lines);
+  return true;
+}
+function checkRoundEnd(lastCard){
+  if (!state.gameStarted || state.roundEnded) return false;
+  if (state.playerHand.length === 0) return finishRound('player', lastCard);
+  if (state.enemyHand.length === 0) return finishRound('enemy', lastCard);
+  return false;
+}
+function drawOneTo(hand){ if (state.deck.length === 0) return null; const card = state.deck.pop(); hand.push(card); return card; }
+function rebuildDeckFromPile(){
+  if (state.pile.length <= 1) return false;
+  const lastTableCard = lastPileCard();
+  const rest = state.pile.slice(0, -1);
+  state.deck = state.rules.deckMode === 'flip' ? reverseCopy(rest) : shuffle(rest);
+  state.pile = [lastTableCard];
+  state.currentRunActor = null;
+  state.currentRunCards = [lastTableCard];
+  setStatus('Колода была восстановлена из сброса.', `${state.rules.deckMode === 'flip' ? 'Сброс перевёрнут.' : 'Сброс перемешан.'} На столе оставлена ${cardText(lastTableCard)}.`);
+  return true;
+}
+function ensureDeckAvailable(){ if (state.deck.length > 0) return true; return rebuildDeckFromPile(); }
+function specialEffect(card){
+  const mode = state.rules.gameVariant || '101';
+  if (mode === 'bridge'){
+    if (card.rank === '6') return { draw: 4, skip: true };
+    if (card.rank === '7') return { draw: 2, skip: false };
+    if (card.rank === 'A') return { draw: 0, skip: true };
+    return null;
+  }
+  if (card.rank === '6') return { draw: 1, skip: true };
+  if (card.rank === '7') return { draw: 2, skip: true };
+  if (card.rank === 'A') return { draw: 0, skip: true };
+  if (card.rank === 'K' && card.suit === 'hearts') return { draw: 4, skip: true };
+  return null;
+}
+function autoSync(){
+  render();
+  try { sendState(); }
+  catch (e) { logNet('[error sync] ' + e.message); }
+}
+function startSet(resetTotals = false){
+  readSettings();
+  hideRoundEnd();
+  state.roundEndInfo = null;
+  state.roundEndInfoClient = null;
+  state.matchOver = false;
+  if (resetTotals){
+    archiveCurrentGameIfNeeded();
+    state.scores = { playerTotal: 0, enemyTotal: 0, playerRound: 0, enemyRound: 0 };
+    state.lastSetWinner = null;
+    state.history = [];
+    state.setSummaries = [];
+    state.currentGameSets = [];
+    state.sessionEvents = [];
+    state.sessionStartedAt = localDisplayStamp();
+    state.gameLogDate = state.sessionStartedAt.slice(0, 10).replace(/ /g, '');
+  } else {
+    state.scores.playerRound = 0;
+    state.scores.enemyRound = 0;
+    if (!state.sessionStamp) state.sessionStamp = localStamp();
+  }
+  state.showEnemy = false; state.showDeck = false; state.showAllPile = false;
+  state.deck = makeDeck(); state.playerHand = []; state.enemyHand = []; state.pile = [];
+  state.forcedSuit = null; state.pendingSuitChoice = false; state.pendingSuitChoiceRole = null;
+  state.currentRunActor = null; state.currentRunCards = [];
+  state.gameStarted = true; state.roundEnded = false;
+  for (let i=0;i<state.rules.handSize;i++){ state.playerHand.push(state.deck.pop()); state.enemyHand.push(state.deck.pop()); }
+  state.turn = determineStarter();
+  state.lastAction = 'старт нового сета';
+  eventLog('set', `Старт нового сета. Первый ход: ${state.turn === 'player' ? 'вы' : 'соперник'}.`);
+  debugEvent('set', 'Set started.', `starter=${state.turn} hostHand=${cardsText(state.playerHand)} clientHand=${cardsText(state.enemyHand)}`);
+  refreshClassicLogCache();
+  setStatus('Новый сет.', state.turn === 'player' ? 'Первый ход вы.' : 'Первый ход соперник.');
+  autoSync();
+}
+async function applySpecial(card, actor){
+  const effect = specialEffect(card); if (!effect) return false;
+  const targetHand = actor === 'player' ? state.enemyHand : state.playerHand;
+  const actorText = actor === 'player' ? 'Вы' : 'Соперник';
+  const targetText = actor === 'player' ? 'Соперник' : 'Вы';
+  const drawn = [];
+  if (effect.draw > 0){
+    for (let i=0;i<effect.draw;i++){
+      if (!ensureDeckAvailable()) break;
+      const drawnCard = drawOneTo(targetHand);
+      if (!drawnCard) break;
+      drawn.push(cardText(drawnCard));
+      eventLog('draw', `${targetText} добрал ${cardText(drawnCard)} из-за карты ${cardText(card)}.`);
+    }
+  }
+  state.forcedSuit = null;
+  state.turn = effect.skip ? actor : (actor === 'player' ? 'enemy' : 'player');
+  debugEvent('special', `${actorText} activated ${cardText(card)}.`, `draw=${effect.draw} drawn=${drawn.join(', ') || '—'} nextTurn=${state.turn}`);
+  const skipText = effect.skip ? `${targetText} пропускает ход. ${actorText} ходит снова.` : `Теперь ход ${targetText.toLowerCase()}.`;
+  setStatus(`${actorText} походил ${cardText(card)}.`, skipText);
+  return true;
 }
 function createCardElement(card, opts = {}){
   const { faceUp = true, clickable = false, playable = false, clickHandler = null } = opts;
@@ -498,12 +1023,12 @@ function updateBgButton(){
   if (!btn) return;
   btn.textContent = state.bgFiles.length ? `BG ${state.bgIndex + 1}/${state.bgFiles.length}` : 'BG';
 }
-function cycleBackgrounds(){
+function cycleBackgrounds(direction = 1){
   if (!state.bgFiles || !state.bgFiles.length){
     updateBgButton();
     return;
   }
-  applyBackgroundIndex(state.bgIndex + 1, false);
+  applyBackgroundIndex(state.bgIndex + direction, true);
 }
 function setBodyBackground(url){
   document.documentElement.style.setProperty('--page-bg-image', url ? `url("${url}")` : "radial-gradient(circle at 30% 26%, #eadbc0 0%, #d3b186 34%, #b17d56 68%, #8e6140 100%)");
@@ -524,6 +1049,9 @@ function applyBackgroundIndex(index, sync){
   setBodyBackground(item.url);
   updateBgButton();
 
+  state.rules.tableBgName = item.name;
+  if (sync) autoSync();
+
 }
 function applyPendingBackground(){
   const idx = findBgIndexByName(state.pendingBgName || state.bgName);
@@ -542,7 +1070,7 @@ function loadBackgroundFiles(fileList){
 }
 function renderEnemy(){
   const row = $('enemyRow'); row.innerHTML = '';
-  state.enemyHand.forEach(card => {
+  state.enemyHand.forEach((card, index) => {
     const slot = document.createElement('div'); slot.className = 'card-slot';
     const faceUp = state.showEnemy;
     const el = createCardElement(card, { faceUp });
@@ -558,27 +1086,28 @@ function renderPlayer(){
   const row = $('playerRow'); row.innerHTML = '';
   const playable = getPlayableCards(state.playerHand);
   state.playerHand.forEach((card, index) => {
-    const slot = document.createElement('div'); slot.className = 'card-slot'; slot.dataset.index = index;
+    const slot = document.createElement('div'); slot.className = 'card-slot';
     const el = createCardElement(card, {
       faceUp: true,
       clickable: true,
-      playable: state.turn === 'player' && !state.pendingSuitChoice && playable.includes(card),
-      clickHandler: () => clientPlay(index)
+      playable: state.turn === 'player' && !state.pendingSuitChoice && !state.actionRunning && playable.includes(card),
+      clickHandler: () => hostPlay(index)
     });
-    el.draggable = true;
-    el.addEventListener('dragstart', () => { state.dragIndex = index; });
+    if (state.handHighlightIndex === index) el.classList.add('swap-highlight');
+    el.draggable = !state.actionRunning;
+    el.addEventListener('dragstart', () => { state.dragIndex = index; el.classList.add('dragging'); });
+    el.addEventListener('dragend', () => { state.dragIndex = null; el.classList.remove('dragging'); });
     slot.addEventListener('dragover', (e) => e.preventDefault());
     slot.addEventListener('drop', (e) => {
       e.preventDefault();
+      if (state.actionRunning) return;
+      if (state.deckDragIndex !== null) { swapHandCardWithDeck(index, state.deckDragIndex); return; }
       if (state.dragIndex === null || state.dragIndex === index) return;
-      const original = state.playerHand.map((_, i) => i);
-      const movedCard = state.playerHand.splice(state.dragIndex, 1)[0];
-      const movedIdx = original.splice(state.dragIndex, 1)[0];
-      state.playerHand.splice(index, 0, movedCard);
-      original.splice(index, 0, movedIdx);
+      const moved = state.playerHand.splice(state.dragIndex,1)[0];
+      state.playerHand.splice(index,0,moved);
       state.dragIndex = null;
       render();
-      sendMessage({type:'client_reorder', order: original});
+      sendState();
     });
     slot.appendChild(el); row.appendChild(slot);
   });
@@ -597,9 +1126,24 @@ function renderDeck(){
     const gap = maxShown > 30 ? 14 : maxShown > 24 ? 16 : maxShown > 18 ? 18 : 22;
     deckStack.style.width = `${Math.max(520, 86 + (maxShown - 1) * gap)}px`;
     cards.forEach((card, idx) => {
+      const slot = document.createElement('div');
+      slot.className = 'card-slot';
+      slot.style.position = 'absolute';
+      slot.style.left = `${idx * gap}px`;
+      slot.style.top = `${Math.max(0, (maxShown - idx - 1) * 0.25)}px`;
+      slot.addEventListener('dragover', (e) => e.preventDefault());
+      slot.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (state.dragIndex !== null) { swapHandCardWithDeck(state.dragIndex, idx); return; }
+        reorderDeckCards(state.deckDragIndex, idx);
+      });
       const el = createCardElement(card, { faceUp: true });
-      el.style.position = 'absolute'; el.style.left = `${idx * gap}px`; el.style.top = `${Math.max(0, (maxShown - idx - 1) * 0.25)}px`; el.style.transform = 'scale(0.88)';
-      deckStack.appendChild(el);
+      el.style.transform = 'scale(0.88)';
+      el.draggable = !state.actionRunning;
+      el.addEventListener('dragstart', () => { state.deckDragIndex = idx; el.classList.add('dragging'); });
+      el.addEventListener('dragend', () => { state.deckDragIndex = null; el.classList.remove('dragging'); });
+      slot.appendChild(el);
+      deckStack.appendChild(slot);
     });
   } else {
     for (let i=Math.min(state.deck.length,8)-1;i>=0;i--){ const el = createCardElement(null,{faceUp:false}); el.style.position='absolute'; el.style.top=`${i*2}px`; el.style.left=`${i*2}px`; deckStack.appendChild(el); }
@@ -608,8 +1152,8 @@ function renderDeck(){
 }
 function renderPile(){
   const pile = $('pileStack'); pile.innerHTML = '';
-  const visible = state.pile.slice(-18);
-  const gap = visible.length > 14 ? 16 : visible.length > 10 ? 18 : 22;
+  const visible = visiblePileForDisplay(true);
+  const gap = visible.length > 14 ? 16 : visible.length > 10 ? 18 : visible.length > 6 ? 22 : 34;
   visible.forEach((card, idx) => {
     const el = createCardElement(card, { faceUp: true });
     el.style.transform = `translate(${idx * gap}px, ${idx * 1.5}px) scale(0.9)`;
@@ -623,122 +1167,217 @@ function updateVariantWatermark(){
   if (mode === 'bridge') wm.innerHTML = '<div class="wm-bridge">BRIDGE</div>';
   else wm.innerHTML = '<div class="wm-101-wrap"><span class="wm-line"></span><span class="wm-101">101</span><span class="wm-line"></span></div>';
 }
-function renderControls(){ $('drawBtn').disabled = !(state.gameStarted && !state.roundEnded && !state.matchOver && state.turn === 'player' && !state.pendingSuitChoice && shouldEnableDraw(state.playerHand)); }
+function renderControls(){ $('drawBtn').disabled = !(state.gameStarted && !state.roundEnded && !state.matchOver && state.turn === 'player' && !state.pendingSuitChoice && !state.actionRunning && shouldEnableDraw(state.playerHand)); $('nextSetBtn').disabled = !!state.matchOver; }
+function enqueueGameAction(fn){
+  const run = async () => {
+    state.actionRunning = true;
+    renderControls();
+    try {
+      return await fn();
+    } finally {
+      state.actionRunning = false;
+      render();
+    }
+  };
+  state.actionQueue = state.actionQueue.then(run, run);
+  return state.actionQueue;
+}
 function render(){ updateVariantWatermark(); renderEnemy(); renderPlayer(); renderDeck(); renderPile(); renderControls(); setConnText(); }
 
-
-function applySignalPreset(){
-  const preset = $('signalPreset');
-  const url = $('signalUrl');
-  if (!preset || !url) return;
-  if (preset.value === 'railway') url.value = SERVER_PRESETS.railway;
-  else if (preset.value === 'localhost') url.value = SERVER_PRESETS.localhost;
+async function hostPlay(index){
+  return enqueueGameAction(() => hostPlayCore(index));
 }
-function showRulesPanel(){
-  $('rulesLines').textContent = state.rulesText || RULES_TEXT;
-  if ($('rulesBackdrop')) $('rulesBackdrop').style.display = 'block';
-  $('rulesPanel').classList.add('show');
-}
-function hideRulesPanel(){
-  $('rulesPanel').classList.remove('show');
-  if ($('rulesBackdrop')) $('rulesBackdrop').style.display = 'none';
-}
-function historyText(){
-  if (state.scoreHistory) return state.scoreHistory;
-  return 'История пуста.';
-}
-function showHistoryPanel(){
-  $('historyLines').textContent = historyText();
-  if ($('historyBackdrop')) $('historyBackdrop').style.display = 'block';
-  $('historyPanel').classList.add('show');
-}
-function hideHistoryPanel(){
-  $('historyPanel').classList.remove('show');
-  if ($('historyBackdrop')) $('historyBackdrop').style.display = 'none';
-}
-async function pasteFromClipboard(targetId){
-  try{
-    const text = await navigator.clipboard.readText();
-    if (!text) throw new Error('clipboard empty');
-    $(targetId).value = text;
-    logNet('[paste] ' + targetId);
-  }catch(e){
-    $(targetId).focus();
-    $(targetId).select();
-    logNet('[paste unavailable] Вставьте текст вручную в ' + targetId);
+async function hostPlayCore(index){
+  if (!state.gameStarted || state.turn !== 'player' || state.pendingSuitChoice || state.roundEnded) return;
+  const card = state.playerHand[index]; const top = lastPileCard();
+  if (!card) return;
+  if (!canPlayOnTop(card, top, state.forcedSuit)){
+    eventLog('reject', `Host попытался походить недопустимой картой ${cardText(card)}.`);
+    debugEvent('reject', 'Host invalid move.', `card=${cardText(card)} top=${top ? cardText(top) : '-'} forcedSuit=${state.forcedSuit || '-'} playable=${playableText(state.playerHand)}`);
+    setStatus(`Этой картой нельзя ходить: ${cardText(card)}.`, state.forcedSuit ? `Нужно ходить в масть: ${suitInfo(state.forcedSuit).label}.` : '');
+    render();
+    return;
   }
-}
-
-function applyRemoteState(payload){
-  state.rules = payload.rules || {};
-  state.deck = payload.deck || [];
-  state.playerHand = payload.enemyHand || [];   // client sees own hand as playerHand
-  state.enemyHand = payload.playerHand || [];   // host hand as enemyHand
-  state.pile = payload.pile || [];
-  state.showEnemy = !!payload.roundEnded;
-  state.showDeck = false;
-  state.forcedSuit = payload.forcedSuit || null;
-  state.pendingSuitChoice = !!payload.pendingSuitChoice;
-  state.pendingSuitChoiceRole = payload.pendingSuitChoiceRole || null;
-  state.turn = payload.turn === 'player' ? 'enemy' : (payload.turn === 'enemy' ? 'player' : payload.turn);
-  state.gameStarted = payload.gameStarted;
-  state.roundEnded = payload.roundEnded;
-  state.scores = payload.scores || state.scores;
-  state.history = payload.history || state.history;
-  state.matchOver = !!payload.matchOver;
-  state.roundEndInfo = payload.roundEndInfo || null;
-  state.classicLog = payload.classicLog || state.classicLog;
-  state.connectionLog = payload.connectionLog || state.connectionLog || '';
-  state.scoreHistory = payload.scoreHistory || state.scoreHistory;
-  state.rulesText = payload.rulesText || state.rulesText || RULES_TEXT;
-  state.rules.tableBgName = (payload.rules && payload.rules.tableBgName) || state.rules.tableBgName || '';
-  state.pendingBgName = state.rules.tableBgName || state.pendingBgName;
-  applyPendingBackground();
-  let mainText = (!state.gameStarted || state.roundEnded) ? 'Партия завершена.' : (payload.lastAction ? `Последнее действие: ${payload.lastAction}` : 'Получено новое состояние.');
-  let subText = (!state.gameStarted || state.roundEnded) ? 'Нажмите NEXT SET или NEW GAME на стороне host.' : (state.turn === 'player' ? 'Сейчас ваш ход.' : 'Сейчас ход host.');
-  const clientMustChooseSuit = state.pendingSuitChoice && state.pendingSuitChoiceRole === 'enemy';
-  if (clientMustChooseSuit){
-    mainText = 'Выберите масть.';
-    subText = 'После дамы нужно заказать масть.';
-  } else if (state.pendingSuitChoice){
-    subText = 'Host выбирает масть...';
-  }
-  setStatus(mainText, subText);
-  $('pickerInline').classList.toggle('show', clientMustChooseSuit);
-  if (state.roundEndInfo) showRoundEnd(state.roundEndInfo.title, state.roundEndInfo.lines); else hideRoundEnd();
+  state.playerHand.splice(index,1);
+  state.pile.push(card);
+  updateRunAfterPlay('player', card);
+  state.lastAction = `вы походили ${cardText(card)}`;
+  eventLog('move', `Вы походили ${cardText(card)}.`);
+  debugEvent('move', 'Host move accepted.', `card=${cardText(card)} handLeft=${cardsText(state.playerHand)}`);
   render();
+  await delay(ACTION_DELAY_MS);
+
+  if (checkRoundEnd(card)){ autoSync(); return; }
+
+  if (card.rank === 'Q'){
+    state.pendingSuitChoice = true;
+    state.pendingSuitChoiceRole = 'player';
+    $('pickerInline').classList.add('show');
+    setStatus(`Host походил ${cardText(card)}.`, 'Теперь выберите масть.');
+    autoSync();
+    return;
+  }
+  const special = await applySpecial(card, 'player');
+  if (!special){
+    state.forcedSuit = null;
+    state.turn = 'enemy';
+    setStatus(`Host походил ${cardText(card)}.`, 'Ход соперника.');
+  }
+  if (checkRoundEnd(card)){ autoSync(); return; }
+  autoSync();
 }
+async function hostDraw(){
+  return enqueueGameAction(() => hostDrawCore());
+}
+async function hostDrawCore(){
+  if (!state.gameStarted || state.turn !== 'player' || state.pendingSuitChoice || state.roundEnded) return;
+  if (!shouldEnableDraw(state.playerHand)){
+    eventLog('reject', 'Host попытался добрать при запрещённом доборе.');
+    debugEvent('reject', 'Host draw rejected.', `playable=${playableText(state.playerHand)} threshold=${state.rules.drawDisabledAtPlayableCount}`);
+    setStatus('Брать из колоды нельзя: достигнут порог допустимых ходов.', '');
+    render();
+    return;
+  }
+  if (!ensureDeckAvailable()){
+    setStatus('Колода пуста.', '');
+    render();
+    return;
+  }
+  const card = drawOneTo(state.playerHand);
+  state.lastAction = `вы добрали ${cardText(card)}`;
+  eventLog('draw', `Вы добрали ${cardText(card)}.`);
+  debugEvent('draw', 'Host drew card.', `card=${cardText(card)} hand=${cardsText(state.playerHand)}`);
+  render();
+  await delay(ACTION_DELAY_MS);
+  checkRoundEnd(card);
+  autoSync();
+}
+async function applyClientAction(msg){
+  return enqueueGameAction(() => applyClientActionCore(msg));
+}
+async function applyClientActionCore(msg){
+  if (!state.gameStarted){
+    rejectClientAction('Игра ещё не началась.', `msg=${msg.type}`);
+    return;
+  }
+  if (msg.type === 'client_draw'){
+    if (state.turn !== 'enemy' || state.pendingSuitChoice){
+      rejectClientAction('Сейчас client не может брать карту.', `turn=${state.turn} pendingSuitChoice=${state.pendingSuitChoice}`);
+      return;
+    }
+    if (!shouldEnableDraw(state.enemyHand)){
+      rejectClientAction('Client не может брать: достигнут порог допустимых ходов.', `playable=${playableText(state.enemyHand)} threshold=${state.rules.drawDisabledAtPlayableCount}`);
+      return;
+    }
+    if (!ensureDeckAvailable()){
+      rejectClientAction('Колода пуста и восстановить её нельзя.', '');
+      return;
+    }
+    const card = drawOneTo(state.enemyHand);
+    state.lastAction = `соперник добрал ${cardText(card)}`;
+    eventLog('draw', `Соперник добрал ${cardText(card)}.`);
+    debugEvent('draw', 'Client drew card.', `card=${cardText(card)} hand=${cardsText(state.enemyHand)}`);
+    render();
+    checkRoundEnd(card);
+    autoSync();
+    return;
+  }
+  if (msg.type === 'client_play'){
+    if (state.turn !== 'enemy' || state.pendingSuitChoice){
+      rejectClientAction('Сейчас client не может ходить.', `turn=${state.turn} pendingSuitChoice=${state.pendingSuitChoice}`);
+      return;
+    }
+    const index = msg.index;
+    const card = state.enemyHand[index];
+    if (!card){
+      rejectClientAction('Client прислал неверный индекс карты.', `index=${index} hand=${cardsText(state.enemyHand)}`);
+      return;
+    }
+    const top = lastPileCard();
+    if (!canPlayOnTop(card, top, state.forcedSuit)){
+      rejectClientAction(`Недопустимый ход картой ${cardText(card)}.`, `top=${top ? cardText(top) : '-'} forcedSuit=${state.forcedSuit || '-'} playable=${playableText(state.enemyHand)}`);
+      return;
+    }
+    state.enemyHand.splice(index,1);
+    state.pile.push(card);
+    updateRunAfterPlay('enemy', card);
+    state.lastAction = `соперник походил ${cardText(card)}`;
+    eventLog('move', `Соперник походил ${cardText(card)}.`);
+    debugEvent('move', 'Client move accepted.', `card=${cardText(card)} handLeft=${cardsText(state.enemyHand)} topAfter=${cardText(card)}`);
+    render();
+
+    if (checkRoundEnd(card)){ autoSync(); return; }
+
+    if (card.rank === 'Q'){
+      state.pendingSuitChoice = true;
+      state.pendingSuitChoiceRole = 'enemy';
+      setStatus(`Соперник походил ${cardText(card)}.`, 'Соперник выбирает масть...');
+      autoSync();
+      return;
+    }
+    const special = await applySpecial(card, 'enemy');
+    if (!special){
+      state.forcedSuit = null;
+      state.turn = 'player';
+      setStatus(`Соперник походил ${cardText(card)}.`, 'Ваш ход.');
+    }
+    if (checkRoundEnd(card)){ autoSync(); return; }
+    autoSync();
+    return;
+  }
+  if (msg.type === 'client_choose_suit'){
+    if (!state.pendingSuitChoice || state.pendingSuitChoiceRole !== 'enemy'){
+      rejectClientAction('Client не должен сейчас выбирать масть.', `pendingSuitChoice=${state.pendingSuitChoice} role=${state.pendingSuitChoiceRole}`);
+      return;
+    }
+    state.forcedSuit = msg.suit;
+    state.pendingSuitChoice = false;
+    state.pendingSuitChoiceRole = null;
+    state.turn = 'player';
+    state.lastAction = `client заказал масть ${suitInfo(state.forcedSuit).label}`;
+    eventLog('suit', `Соперник заказал масть: ${suitInfo(state.forcedSuit).label}.`);
+    debugEvent('suit', 'Client selected suit.', `suit=${msg.suit}`);
+    setStatus(`Соперник заказал масть: ${suitInfo(state.forcedSuit).label}.`, 'Ваш ход.');
+    render();
+    checkRoundEnd();
+    autoSync();
+  }
+}
+
+
 function clearTimer(ref){
   if (ref) clearTimeout(ref);
   return null;
 }
-function cancelClientConnectTimers(){
+function cancelConnectAttemptTimers(){
   state.connection.timers.hello = clearTimer(state.connection.timers.hello);
   state.connection.timers.retry = clearTimer(state.connection.timers.retry);
 }
-function resetClientConnectionFlow(){
-  cancelClientConnectTimers();
-  state.connection.stage = 'idle';
+function resetPeerState(){
+  cancelConnectAttemptTimers();
+  state.connectionReady = false;
+  state.offerSent = false;
+  state.answerApplied = false;
+  state.lastOfferSdp = '';
   state.connection.peerState = 'idle';
   state.connection.dcState = 'closed';
   state.connection.offerId = '';
   state.connection.helloSent = false;
   state.connection.helloReceived = false;
-  state.connection.startedAt = 0;
   state.connection.helloAt = 0;
   state.connection.lastError = '';
-  state.connection.transportPolicy = 'all';
+  state.connection.lastStageResult = '';
 }
-function clientElapsed(){
+function hostElapsed(){
   return state.connection.startedAt ? (Date.now() - state.connection.startedAt) : 0;
 }
-function clientConnSnapshot(){
+function hostConnSnapshot(){
   const pc = state.pc;
-  return `attempt=${state.connection.attemptId} stage=${state.connection.stage} ws=${state.connection.wsState} peer=${state.connection.peerState} dc=${state.connection.dcState} sig=${pc ? pc.signalingState : '-'} ice=${pc ? pc.iceConnectionState : '-'} pc=${pc ? pc.connectionState : '-'} gather=${pc ? pc.iceGatheringState : '-'} policy=${state.connection.transportPolicy}`;
+  return `attempt=${state.connection.attemptId} stage=${state.connection.stage} ws=${state.connection.wsState} peer=${state.connection.peerState} dc=${state.connection.dcState} sig=${pc ? pc.signalingState : '-'} ice=${pc ? pc.iceConnectionState : '-'} pc=${pc ? pc.connectionState : '-'} gather=${pc ? pc.iceGatheringState : '-'} policy=${state.connection.transportPolicy} offerId=${state.connection.offerId || '-'}`;
 }
 function logConn(event, details=''){
   const extra = details ? ` | ${details}` : '';
-  logNet(`[conn] ${event} | ${clientConnSnapshot()} | t=${clientElapsed()}ms${extra}`);
+  logNet(`[conn] ${event} | ${hostConnSnapshot()} | t=${hostElapsed()}ms${extra}`);
 }
 async function logPeerStats(tag){
   if (!state.pc || typeof state.pc.getStats !== 'function') return;
@@ -766,121 +1405,25 @@ async function logPeerStats(tag){
     logNet('[stats error] ' + e.message);
   }
 }
-function updateClientConnText(){
+function updateConnectStatus(){
   if (state.connectionReady) $('connStateText').textContent = 'Connected';
   else $('connStateText').textContent = `No connection (${state.connection.stage})`;
 }
+function syncSignalStatus(){
+  const btn = $('signalHostBtn');
+  if (!btn) return;
+  btn.textContent = state.signaling.connected ? 'Server: host ✓' : (state.connectionReady ? 'Server: host ◇' : 'Server: host');
+  btn.disabled = !!state.signalConnecting;
+}
 function closePeer(reason='manual'){
-  cancelClientConnectTimers();
+  cancelConnectAttemptTimers();
   try { if (state.dc) state.dc.close(); } catch(e){}
   try { if (state.pc) state.pc.close(); } catch(e){}
   state.dc = null;
   state.pc = null;
-  state.connectionReady = false;
-  state.awaitingState = false;
-  state.answerSent = false;
-  state.lastRemoteOfferSdp = '';
-  resetClientConnectionFlow();
-  updateClientConnText();
+  resetPeerState();
+  updateConnectStatus();
   if (reason) logNet('[peer] closed: ' + reason);
-}
-function scheduleClientHelloTimeout(attemptId){
-  state.connection.timers.hello = clearTimer(state.connection.timers.hello);
-  state.connection.timers.hello = setTimeout(() => {
-    if (attemptId !== state.connection.attemptId) return;
-    if (state.connectionReady || state.connection.helloReceived) return;
-    logConn('hello timeout');
-  }, 45000);
-}
-function updateClientAttemptFromOffer(msg){
-  const attemptId = Number(msg.attemptId || 0) || (state.connection.attemptId + 1);
-  state.connection.attemptId = attemptId;
-  state.connection.offerId = String(msg.offerId || '');
-  state.connection.stage = String(msg.stage || 'remote-offer');
-  state.connection.startedAt = Date.now();
-  state.connection.peerState = 'offer-received';
-  state.connection.dcState = 'closed';
-  state.connection.helloSent = false;
-  state.connection.helloReceived = false;
-  state.connection.transportPolicy = String(msg.transportPolicy || 'all');
-}
-function bindClientPeerEvents(){
-  if (!state.pc) return;
-  state.pc.onsignalingstatechange = () => { state.connection.peerState = state.pc.signalingState; logConn('signaling'); };
-  state.pc.onicegatheringstatechange = () => { logConn('gathering'); updateClientConnText(); };
-  state.pc.oniceconnectionstatechange = () => {
-    logConn('ice');
-    updateClientConnText();
-    if (['connected','completed'].includes(state.pc.iceConnectionState)) logPeerStats('client-ice');
-  };
-  state.pc.onconnectionstatechange = () => {
-    logConn('pc');
-    updateClientConnText();
-    if (state.pc.connectionState === 'connected') logPeerStats('client-pc');
-  };
-  state.pc.ondatachannel = (ev) => {
-    state.dc = ev.channel;
-    state.connection.dcState = state.dc.readyState || 'connecting';
-    logConn('dc created', state.dc.label || '');
-    state.dc.onopen = () => {
-      state.connectionReady = true;
-      state.connection.dcState = 'open';
-      state.connection.helloSent = true;
-      state.connection.peerState = 'connected';
-      updateClientConnText();
-      logConn('dc open');
-      logNet('[HELLO] HELLO=SENT=HELLO');
-      sendMessage({type:'hello', attemptId: state.connection.attemptId, offerId: state.connection.offerId});
-      scheduleClientHelloTimeout(state.connection.attemptId);
-      logPeerStats('client-open');
-    };
-    state.dc.onclose = () => {
-      state.connectionReady = false;
-      state.awaitingState = false;
-      state.connection.dcState = 'closed';
-      updateClientConnText();
-      logConn('dc close');
-    };
-    state.dc.onmessage = (msgEv) => onMessage(JSON.parse(msgEv.data));
-  };
-}
-function buildPeer(transportPolicy='all'){
-  closePeer('rebuild');
-  state.connection.stage = state.connection.stage === 'idle' ? 'offer-processing' : state.connection.stage;
-  state.connection.peerState = 'building';
-  state.connection.transportPolicy = transportPolicy;
-  state.pc = new RTCPeerConnection({
-    iceTransportPolicy: transportPolicy,
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      {
-        urls: [
-          'turn:global.relay.metered.ca:80',
-          'turn:global.relay.metered.ca:80?transport=tcp',
-          'turn:global.relay.metered.ca:443',
-          'turns:global.relay.metered.ca:443?transport=tcp'
-        ],
-        username: '680eb6076718e5a0bfa7fbc1',
-        credential: '/oAmKdtqPst8Vc2r'
-      }
-    ]
-  });
-  bindClientPeerEvents();
-  updateClientConnText();
-  logConn('peer built');
-}
-function sendMessage(obj){
-  if (!state.dc || state.dc.readyState !== 'open'){ logNet('[send] канал не открыт'); return false; }
-  state.dc.send(JSON.stringify(obj));
-  logNet('[send] ' + obj.type + ' | ' + clientConnSnapshot());
-  return true;
-}
-
-function syncSignalStatus(){
-  const btn = $('signalClientBtn');
-  if (!btn) return;
-  btn.textContent = state.signaling.connected ? 'Сервер: client ✓' : 'Сервер: client';
-  btn.disabled = !!state.signalConnecting;
 }
 function closeSignalSocket(){
   try { if (state.signaling.ws) state.signaling.ws.close(); } catch(e){}
@@ -916,13 +1459,153 @@ function waitIceReady(pc, timeoutMs=1200){
     pc.addEventListener('icegatheringstatechange', check);
   });
 }
-async function startSignalClient(){
+function setConnectStage(stage, transportPolicy){
+  state.connection.stage = stage;
+  state.connection.transportPolicy = transportPolicy;
+  updateConnectStatus();
+  logConn('stage', `${stage}/${transportPolicy}`);
+}
+function makeOfferId(){
+  return `offer-${state.connection.attemptId}-${Date.now()}`;
+}
+function bindHostPeerEvents(){
+  if (!state.pc) return;
+  state.pc.onsignalingstatechange = () => { state.connection.peerState = state.pc.signalingState; logConn('signaling'); };
+  state.pc.onicegatheringstatechange = () => { logConn('gathering'); updateConnectStatus(); };
+  state.pc.oniceconnectionstatechange = () => {
+    logConn('ice');
+    updateConnectStatus();
+    if (['connected','completed'].includes(state.pc.iceConnectionState)) logPeerStats('host-ice');
+    if (['failed','disconnected'].includes(state.pc.iceConnectionState) && !state.connectionReady){
+      state.connection.lastStageResult = state.pc.iceConnectionState;
+    }
+  };
+  state.pc.onconnectionstatechange = () => {
+    logConn('pc');
+    updateConnectStatus();
+    if (state.pc.connectionState === 'connected') logPeerStats('host-pc');
+  };
+  state.dc = state.pc.createDataChannel('czdurak');
+  state.connection.dcState = state.dc.readyState || 'connecting';
+  state.dc.onopen = () => {
+    state.connectionReady = true;
+    state.offerSent = false;
+    state.answerApplied = true;
+    state.connection.dcState = 'open';
+    state.connection.peerState = 'connected';
+    state.connection.helloSent = true;
+    cancelConnectAttemptTimers();
+    updateConnectStatus();
+    syncSignalStatus();
+    logConn('dc open');
+    logNet('[HELLO] HELLO=SENT=HELLO');
+    sendMessage({type:'hello', attemptId: state.connection.attemptId, offerId: state.connection.offerId});
+    logPeerStats('host-open');
+  };
+  state.dc.onclose = () => {
+    state.connectionReady = false;
+    state.offerSent = false;
+    state.answerApplied = false;
+    state.connection.dcState = 'closed';
+    updateConnectStatus();
+    syncSignalStatus();
+    logConn('dc close');
+  };
+  state.dc.onmessage = (ev) => onMessage(JSON.parse(ev.data));
+}
+function buildPeer(transportPolicy='all'){
+  closePeer('rebuild');
+  state.connection.peerState = 'building';
+  state.connection.transportPolicy = transportPolicy;
+  state.pc = new RTCPeerConnection({
+    iceTransportPolicy: transportPolicy,
+    iceServers:[
+      {urls:'stun:stun.l.google.com:19302'},
+      {
+        urls: [
+          'turn:global.relay.metered.ca:80',
+          'turn:global.relay.metered.ca:80?transport=tcp',
+          'turn:global.relay.metered.ca:443',
+          'turns:global.relay.metered.ca:443?transport=tcp'
+        ],
+        username: '680eb6076718e5a0bfa7fbc1',
+        credential: '/oAmKdtqPst8Vc2r'
+      }
+    ]
+  });
+  bindHostPeerEvents();
+  updateConnectStatus();
+  logConn('peer built');
+}
+async function buildOfferForSignal(){
+  if (!state.pc) buildPeer(state.connection.transportPolicy || 'all');
+  const offer = await state.pc.createOffer();
+  await state.pc.setLocalDescription(offer);
+  const waitReason = await waitIceReady(state.pc, state.connection.transportPolicy === 'relay' ? 3500 : 1200);
+  logConn('offer ready', `reason=${waitReason}`);
+  return state.pc.localDescription;
+}
+async function sendOfferToRoom(room){
+  if (state.connectionReady){
+    logNet('[signal] offer skipped: channel already open');
+    return;
+  }
+  if (state.offerSent && state.pc && state.pc.signalingState === 'have-local-offer'){
+    logNet('[signal] offer already pending');
+    return;
+  }
+  if (!state.pc || state.pc.signalingState === 'closed'){
+    buildPeer(state.connection.transportPolicy || 'all');
+  }
+  const localOffer = await buildOfferForSignal();
+  state.offerSent = true;
+  state.answerApplied = false;
+  state.lastOfferSdp = JSON.stringify(localOffer);
+  state.connection.offerId = makeOfferId();
+  state.connection.peerState = 'offer-sent';
+  $('offerOut').value = JSON.stringify(localOffer);
+  if (state.signaling.ws && state.signaling.ws.readyState === WebSocket.OPEN){
+    state.signaling.ws.send(JSON.stringify({type:'offer', room, sdp: localOffer, offerId: state.connection.offerId, attemptId: state.connection.attemptId, stage: state.connection.stage, transportPolicy: state.connection.transportPolicy}));
+    logConn('offer sent');
+  }
+  syncSignalStatus();
+}
+function scheduleHelloTimeout(attemptId, stage){
+  state.connection.timers.hello = clearTimer(state.connection.timers.hello);
+  const timeoutMs = stage === 'all' ? 15000 : 30000;
+  state.connection.timers.hello = setTimeout(async () => {
+    if (attemptId != state.connection.attemptId) return;
+    if (state.connectionReady || state.connection.helloReceived) return;
+    logConn('hello timeout', `stage=${stage} timeout=${timeoutMs}`);
+    if (stage === 'all'){
+      await startConnectStage('relay');
+      return;
+    }
+    state.connection.stage = 'failed';
+    state.connection.lastError = 'hello timeout';
+    updateConnectStatus();
+    setStatus('Соединение не установлено.', 'Не удалось получить hello даже после relay fallback.');
+  }, timeoutMs);
+}
+async function startConnectStage(stage){
+  if (!state.signaling.ws || state.signaling.ws.readyState !== WebSocket.OPEN) return;
+  state.connection.attemptId += 1;
+  state.connection.startedAt = Date.now();
+  state.connection.helloReceived = false;
+  state.connection.helloSent = false;
+  state.connection.lastError = '';
+  setConnectStage(stage, stage === 'relay' ? 'relay' : 'all');
+  buildPeer(state.connection.transportPolicy);
+  await sendOfferToRoom(state.signaling.room);
+  scheduleHelloTimeout(state.connection.attemptId, stage);
+}
+async function startSignalHost(){
   if (state.signalConnecting){
-    logNet('[signal] client request ignored: connecting');
+    logNet('[signal] host request ignored: connecting');
     return;
   }
   if (state.connectionReady){
-    logNet('[signal] client request ignored: already connected');
+    logNet('[signal] host request ignored: already connected');
     return;
   }
   const url = $('signalUrl').value.trim();
@@ -932,7 +1615,7 @@ async function startSignalClient(){
     return;
   }
   closeSignalSocket();
-  closePeer('restart client signal');
+  closePeer('restart host signal');
   state.signalConnecting = true;
   state.signaling.url = url;
   state.signaling.room = room;
@@ -946,39 +1629,37 @@ async function startSignalClient(){
     state.signaling.connected = true;
     state.connection.wsState = 'open';
     syncSignalStatus();
-    logConn('ws open', 'role=client');
-    ws.send(JSON.stringify({type:'join', role:'client', room}));
+    logConn('ws open', 'role=host');
+    ws.send(JSON.stringify({type:'join', role:'host', room}));
     logNet('[signal] join sent');
   };
   ws.onmessage = async (ev) => {
     try{
       const msg = JSON.parse(ev.data);
-      if (msg.type === 'offer' && msg.sdp){
-        const sdpKey = JSON.stringify(msg.sdp);
-        if (state.connectionReady){
-          logNet('[signal] offer ignored: already connected');
+      if (msg.type === 'answer' && msg.sdp){
+        if (!state.pc){
+          logNet('[signal] answer ignored: no peer');
           return;
         }
-        if (state.answerSent && state.lastRemoteOfferSdp === sdpKey){
-          logNet('[signal] duplicate offer ignored');
+        if (msg.offerId && state.connection.offerId && msg.offerId !== state.connection.offerId){
+          logNet('[signal] stale answer ignored');
           return;
         }
-        updateClientAttemptFromOffer(msg);
-        buildPeer(msg.transportPolicy || 'all');
+        if (state.connectionReady || state.answerApplied || state.pc.signalingState !== 'have-local-offer'){
+          logNet('[signal] duplicate answer ignored');
+          return;
+        }
         await state.pc.setRemoteDescription(msg.sdp);
-        state.connection.peerState = 'remote-description-set';
-        logConn('offer applied', `offerId=${state.connection.offerId}`);
-        const answer = await state.pc.createAnswer();
-        await state.pc.setLocalDescription(answer);
-        const waitReason = await waitIceReady(state.pc, state.connection.transportPolicy === 'relay' ? 3500 : 1200);
-        logConn('answer ready', `reason=${waitReason} offerId=${state.connection.offerId}`);
-        $('answerOut').value = JSON.stringify(state.pc.localDescription);
-        ws.send(JSON.stringify({type:'answer', room, sdp: state.pc.localDescription, offerId: state.connection.offerId, attemptId: state.connection.attemptId}));
-        state.answerSent = true;
-        state.lastRemoteOfferSdp = sdpKey;
-        state.connection.peerState = 'answer-sent';
-        scheduleClientHelloTimeout(state.connection.attemptId);
-        logConn('answer sent', `offerId=${state.connection.offerId}`);
+        state.answerApplied = true;
+        state.offerSent = false;
+        state.connection.peerState = 'answer-applied';
+        syncSignalStatus();
+        logConn('answer applied');
+      } else if (msg.type === 'peer_joined'){
+        logConn('peer joined');
+        if (!state.connectionReady && !state.offerSent){
+          try{ await startConnectStage('all'); }catch(e){ logNet('[signal error] ' + e.message); }
+        }
       } else if (msg.type === 'error'){
         state.connection.lastError = msg.message || 'server error';
         logNet('[signal error] ' + state.connection.lastError);
@@ -988,9 +1669,8 @@ async function startSignalClient(){
     }
   };
   ws.onclose = () => {
-    state.awaitingState = false;
-    state.signaling.connected = false;
     state.signalConnecting = false;
+    state.signaling.connected = false;
     state.connection.wsState = 'closed';
     syncSignalStatus();
     logConn('ws close');
@@ -1000,88 +1680,117 @@ async function startSignalClient(){
     logConn('ws error');
   };
 }
-
+function sendMessage(obj){
+  if (!state.dc || state.dc.readyState !== 'open'){ logNet('[send] канал не открыт'); return false; }
+  state.dc.send(JSON.stringify(obj));
+  logNet('[send] ' + obj.type + ' | ' + hostConnSnapshot());
+  return true;
+}
+function sendState(){
+  const classicLog = refreshClassicLogCache();
+  sendMessage({type:'state_sync', payload: exportState(classicLog), attemptId: state.connection.attemptId, offerId: state.connection.offerId});
+}
+function exportState(classicLog){
+  return {
+    rules: state.rules, deck: state.deck, playerHand: state.playerHand, enemyHand: state.enemyHand, pile: visiblePileForDisplay(false),
+    showEnemy: false, showDeck: false, forcedSuit: state.forcedSuit,
+    pendingSuitChoice: state.pendingSuitChoice, pendingSuitChoiceRole: state.pendingSuitChoiceRole,
+    turn: state.turn, gameStarted: state.gameStarted, roundEnded: state.roundEnded, lastAction: state.lastAction || '',
+    scores: state.scores, lastSetWinner: state.lastSetWinner, history: state.history, matchOver: state.matchOver, roundEndInfo: state.roundEndInfoClient || state.roundEndInfo,
+    scoreHistory: buildScoreHistory(),
+    rulesText: RULES_TEXT,
+    classicLog: classicLog || state.classicLogCache || buildClassicLog(),
+    connectionLog: hostConnSnapshot()
+  };
+}
 function onMessage(msg){
-  logNet('[recv] ' + msg.type + ' | ' + clientConnSnapshot());
+  logNet('[recv] ' + msg.type + ' | ' + hostConnSnapshot());
   if (msg.type === 'hello'){
     state.connectionReady = true;
+    state.offerSent = false;
+    state.answerApplied = true;
     state.connection.helloReceived = true;
     state.connection.helloAt = Date.now();
     state.connection.stage = 'connected';
     state.connection.peerState = 'connected';
-    cancelClientConnectTimers();
-    updateClientConnText();
+    cancelConnectAttemptTimers();
+    updateConnectStatus();
     syncSignalStatus();
     logNet('[HELLO] HELLO=RECEIVED=HELLO');
     logConn('hello received');
+    sendState();
     return;
   }
-  if (msg.type === 'ping'){ sendMessage({type:'pong', attemptId: state.connection.attemptId}); return; }
-  if (msg.type === 'state_sync'){ state.awaitingState = false; applyRemoteState(msg.payload); sendMessage({type:'ack_state', attemptId: state.connection.attemptId}); return; }
-}
-function clientPlay(index){
-  if (!state.gameStarted || state.turn !== 'player' || state.pendingSuitChoice || state.awaitingState) return;
-  render();
-  if (!sendMessage({type:'client_play', index})){
-    render();
+  if (msg.type === 'pong'){ return; }
+  if (msg.type === 'ack_state'){ return; }
+  if (msg.type === 'client_reorder'){
+    if (Array.isArray(msg.order) && msg.order.length === state.enemyHand.length){
+      state.enemyHand = msg.order.map(i => state.enemyHand[i]).filter(Boolean);
+      state.lastAction = 'client переставил карты';
+      autoSync();
+    }
     return;
   }
-  state.awaitingState = true;
+  if (msg.type === 'client_draw' || msg.type === 'client_play' || msg.type === 'client_choose_suit'){ applyClientAction(msg); return; }
 }
-function clientDraw(){
-  if (!state.gameStarted || state.turn !== 'player' || state.pendingSuitChoice || state.awaitingState) return;
-  render();
-  if (!sendMessage({type:'client_draw'})){
-    render();
-    return;
-  }
-  state.awaitingState = true;
-}
-$('applyOfferBtn').addEventListener('click', async () => {
+$('createOfferBtn').addEventListener('click', async () => {
+  state.connection.attemptId += 1;
+  state.connection.startedAt = Date.now();
+  state.connection.stage = 'manual';
+  state.connection.transportPolicy = 'all';
+  buildPeer('all');
+  const offer = await state.pc.createOffer();
+  await state.pc.setLocalDescription(offer);
+  const waitReason = await waitIceReady(state.pc, 1200);
+  state.connection.offerId = makeOfferId();
+  state.offerSent = true;
+  $('offerOut').value = JSON.stringify(state.pc.localDescription);
+  logConn('manual offer created', `reason=${waitReason}`);
+});
+$('applyAnswerBtn').addEventListener('click', async () => {
   try{
-    state.connection.attemptId += 1;
-    state.connection.offerId = `manual-${state.connection.attemptId}`;
-    state.connection.stage = 'manual';
-    state.connection.startedAt = Date.now();
-    buildPeer('all');
-    const offer = JSON.parse($('offerIn').value);
-    await state.pc.setRemoteDescription(offer);
-    const answer = await state.pc.createAnswer();
-    await state.pc.setLocalDescription(answer);
-    const waitReason = await waitIceReady(state.pc, 1200);
-    $('answerOut').value = JSON.stringify(state.pc.localDescription);
-    state.answerSent = true;
-    state.lastRemoteOfferSdp = JSON.stringify(offer);
-    state.connection.peerState = 'answer-sent';
-    logConn('manual answer created', `reason=${waitReason}`);
+    const answer = JSON.parse($('answerIn').value);
+    await state.pc.setRemoteDescription(answer);
+    state.answerApplied = true;
+    state.offerSent = false;
+    state.connection.peerState = 'answer-applied';
+    logConn('manual answer applied');
   }catch(e){ logNet('[error] ' + e.message); }
 });
-$('drawBtn').addEventListener('click', clientDraw);
-$('deckStack').addEventListener('dblclick', clientDraw);
-$('pasteOfferBtn').addEventListener('click', () => pasteFromClipboard('offerIn'));
-$('pongBtn').addEventListener('click', () => sendMessage({type:'pong'}));
-$('copyAnswerBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('answerOut').value || ''); logNet('[copy] answer'); } catch(e){ logNet('[error copy answer] ' + e.message); } });
+$('pasteAnswerBtn').addEventListener('click', () => pasteFromClipboard('answerIn'));
+$('pingBtn').addEventListener('click', () => sendMessage({type:'ping'}));
+$('copyOfferBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('offerOut').value || ''); logNet('[copy] offer'); } catch(e){ logNet('[error copy offer] ' + e.message); } });
 $('copyLogBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('netLog').textContent || ''); logNet('[copy] log'); } catch(e){ logNet('[error copy log] ' + e.message); } });
 $('clearLogBtn').addEventListener('click', () => { $('netLog').textContent = ''; });
-$('logToggleBtn').addEventListener('click', () => { state.logEnabled = !state.logEnabled; $('logToggleBtn').textContent = state.logEnabled ? 'ЛОГ ON' : 'ЛОГ OFF'; });
-$('debugToggleBtn').addEventListener('click', () => { state.debugEnabled = !state.debugEnabled; $('debugToggleBtn').textContent = state.debugEnabled ? 'DEBUG ON' : 'DEBUG OFF'; });
+$('logToggleBtn').addEventListener('click', toggleGameLog);
+$('debugToggleBtn').addEventListener('click', toggleDebugLog);
 $('historyBtn').addEventListener('click', showHistoryPanel);
 $('rulesBtn').addEventListener('click', showRulesPanel);
-$('bgCycleBtn').addEventListener('click', cycleBackgrounds);
+window.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') cycleBackgrounds(-1); });
+$('bgCycleBtn').addEventListener('click', () => cycleBackgrounds(1));
 $('signalPreset').addEventListener('change', applySignalPreset);
-$('signalClientBtn').addEventListener('click', startSignalClient);
+$('folderBtn').addEventListener('click', chooseLogFolder);
+$('newGameBtn').addEventListener('click', () => { eventLog('system', 'NEW GAME'); startSet(true); });
+$('nextSetBtn').addEventListener('click', () => { eventLog('system', 'NEXT SET'); startSet(false); });
+$('toggleEnemyBtn').addEventListener('click', () => { state.showEnemy = !state.showEnemy; render(); });
+$('toggleDeckBtn').addEventListener('click', () => { state.showDeck = !state.showDeck; render(); });
+$('togglePileBtn').addEventListener('click', () => { state.showAllPile = !state.showAllPile; render(); });
+$('signalHostBtn').addEventListener('click', startSignalHost);
+$('drawBtn').addEventListener('click', hostDraw);
+$('deckStack').addEventListener('dblclick', hostDraw);
 $('pickerInline').querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
-  if (!state.pendingSuitChoice || state.pendingSuitChoiceRole !== 'enemy' || state.awaitingState) return;
-  logNet('[send] client_choose_suit ' + btn.dataset.suit);
-  render();
-  if (!sendMessage({type:'client_choose_suit', suit: btn.dataset.suit})){
-    render();
-    return;
-  }
-  state.awaitingState = true;
+  if (!state.pendingSuitChoice || state.pendingSuitChoiceRole !== 'player') return;
+  state.forcedSuit = btn.dataset.suit;
   state.pendingSuitChoice = false;
   state.pendingSuitChoiceRole = null;
   $('pickerInline').classList.remove('show');
+  state.turn = 'enemy';
+  state.lastAction = `host заказал масть ${suitInfo(state.forcedSuit).label}`;
+  eventLog('suit', `Игрок заказал масть: ${suitInfo(state.forcedSuit).label}.`);
+  debugEvent('suit', 'Host selected suit.', `suit=${btn.dataset.suit}`);
+  setStatus(`Host заказал масть: ${suitInfo(state.forcedSuit).label}.`, 'Ход соперника.');
+  checkRoundEnd();
+  autoSync();
 }));
 
 const __closeBtn = $('closeRoundEndBtn');
@@ -1089,13 +1798,15 @@ const __closeRulesBtn = $('closeRulesBtn'); if (__closeRulesBtn) __closeRulesBtn
 const __rulesBackdrop = $('rulesBackdrop'); if (__rulesBackdrop) __rulesBackdrop.addEventListener('click', hideRulesPanel); if (__closeBtn) __closeBtn.addEventListener('click', hideRoundEnd);
 const __closeHistoryBtn = $('closeHistoryBtn'); if (__closeHistoryBtn) __closeHistoryBtn.addEventListener('click', hideHistoryPanel);
 const __historyBackdrop = $('historyBackdrop'); if (__historyBackdrop) __historyBackdrop.addEventListener('click', hideHistoryPanel);
+state.sessionStamp = localStamp();
+refreshClassicLogCache();
 $('signalRoom').value = VERSION_NUM;
 applySignalPreset();
 syncSignalStatus();
 loadDefaultButtonBackground();
 loadDefaultTableBackgrounds();
 updateBgButton();
-render(); updateClientConnText();
+render(); updateConnectStatus();
 </script>
 </body>
 </html>
